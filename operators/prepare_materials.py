@@ -96,13 +96,17 @@ class PrepareMaterials(bpy.types.Operator):
 					if image.name == new_image_name:
 						bpy.data.images.remove(image)
 
+				size = int(
+				    list(context.scene.tivoli_settings.texture_size).pop()
+				)
+
 				new_image = bpy.data.images.new(
 				    name=MATERIAL_PREFIX + "_" + obj.name,
-				    width=2048,
-				    height=2048,
+				    width=size,
+				    height=size,
 				    alpha=False,
-				    float_buffer=True,  # TODO: neccessary?
-				    # is_data=True
+				    float_buffer=True,
+				    is_data=True
 				)
 				new_image.file_format = "OPEN_EXR"
 

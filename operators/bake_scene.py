@@ -2,6 +2,7 @@ import bpy
 import threading
 
 from .. import utils
+from ..functions.denoise import *
 
 class BakeScene(bpy.types.Operator):
 	bl_idname = "tivoli.bake_scene"
@@ -76,6 +77,7 @@ class BakeScene(bpy.types.Operator):
 		}
 
 		def bakeNextObj(self, render):
+
 			objects_to_bake = render["objects_to_bake"]
 			current_object_index = render["current_object_index"]
 			scene = context.scene
@@ -85,6 +87,8 @@ class BakeScene(bpy.types.Operator):
 
 			obj = objects_to_bake[current_object_index]
 			scene.tivoli_settings.bake_current = obj.name
+
+			print("\nBaking: " + obj.name + "...")
 
 			# select obj
 			utils.deselectAll()
@@ -116,15 +120,18 @@ class BakeScene(bpy.types.Operator):
 			    # save_mode="EXTERNAL",
 			)
 
-			render["current_object_index"] += 1
+			# denoise
+			image = getLightmapNode(obj.material_slots[0].material).image
+			denoise(image)
 
+			# update current index and text
+			render["current_object_index"] += 1
 			progress = render["current_object_index"
 			                 ] / len(objects_to_bake) * 100
-
 			print(
 			    "Baked " + str(render["current_object_index"]) + "/" +
 			    str(len(objects_to_bake)) + ", " + "{:.2f}".format(progress) +
-			    "% - " + obj.name
+			    "%"
 			)
 			scene.tivoli_settings.bake_progress = progress
 

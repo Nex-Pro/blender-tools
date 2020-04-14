@@ -12,9 +12,10 @@ class ExportScene(bpy.types.Operator):
 
 	def execute(self, context):
 
-		# LIGHTMAP_EXT = ".exr" # for saving
-		# LIGHTMAP_TYPE = "OPEN_EXR" # for blender
-		# LIGHTMAP_MIMETYPE = "image/exr" # for gltf
+		# TODO: add 32 bit support to tivoli
+		# LIGHTMAP_EXT = ".exr"  # for saving
+		# LIGHTMAP_TYPE = "OPEN_EXR"  # for blender
+		# LIGHTMAP_MIMETYPE = "image/exr"  # for gltf
 
 		LIGHTMAP_EXT = ".jpg"  # for saving
 		LIGHTMAP_TYPE = "JPEG"  # for blender
