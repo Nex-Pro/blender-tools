@@ -3,142 +3,133 @@ import bpy
 from .. import utils
 
 class PrepareMaterials(bpy.types.Operator):
-    bl_idname = "tivoli.prepare_materials"
-    bl_label = "Tivoli: Prepare Materials"
-    bl_options = {"REGISTER", "UNDO"}
+	bl_idname = "tivoli.prepare_materials"
+	bl_label = "Tivoli: Prepare Materials"
+	bl_options = {"REGISTER", "UNDO"}
 
-    def execute(self, context):
-        scene = context.scene
-        objects = scene.objects
+	def execute(self, context):
+		scene = context.scene
+		objects = scene.objects
 
-        MATERIAL_PREFIX = "Tivoli_Lightmap"
-        # RANDOM_STRING_LENGTH = 8
+		MATERIAL_PREFIX = "Tivoli_Lightmap"
 
-        def serializeName(obj, material):
-            return (
-                MATERIAL_PREFIX + "_" +
-                obj.name + "_" +
-                material.name
-            )
+		# RANDOM_STRING_LENGTH = 8
 
-        def deserializeName(obj, material):
-            return material.name[
-                len(MATERIAL_PREFIX + "_" + obj.name + "_")
-                :
-                99999
-            ]
+		def serializeName(obj, material):
+			return MATERIAL_PREFIX + "_" + obj.name + "_" + material.name
 
-        materials_in_use = []
-        images_in_use = []
+		def deserializeName(obj, material):
+			return material.name[len(MATERIAL_PREFIX + "_" + obj.name +
+			                         "_"):99999]
 
-        bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+		materials_in_use = []
+		images_in_use = []
 
-        for obj in objects:
-            if obj.visible_get() == False or obj.type != "MESH":
-                continue
+		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
-            print("Preparing materials for: " + obj.name)
+		for obj in objects:
+			if obj.visible_get() == False or obj.type != "MESH":
+				continue
 
-            material_slots = obj.material_slots.values()
+			print("Preparing materials for: " + obj.name)
 
-            # for each material slot
-            for index in range(len(material_slots)):
-                material_slot = material_slots[index]
-                material = material_slot.material
+			material_slots = obj.material_slots.values()
 
-                if material == None:
-                    material = utils.findOrCreateDefaultMaterial()
+			# for each material slot
+			for index in range(len(material_slots)):
+				material_slot = material_slots[index]
+				material = material_slot.material
 
-                #  undo tivoli material
-                if material.name.startswith(MATERIAL_PREFIX):
-                    old_material_name = deserializeName(obj, material)
-                    old_material = utils.findMaterial(old_material_name)
+				if material == None:
+					material = utils.findOrCreateDefaultMaterial()
 
-                    if old_material != None:
-                        material = old_material
-                    else:
-                        # cant find old material so use default
-                        material = utils.findOrCreateDefaultMaterial()
+				#  undo tivoli material
+				if material.name.startswith(MATERIAL_PREFIX):
+					old_material_name = deserializeName(obj, material)
+					old_material = utils.findMaterial(old_material_name)
 
-                # find or clone new material and replace
-                new_material_name = serializeName(obj, material)
-                new_material = utils.findMaterialOrCloneWithName(
-                    new_material_name,
-                    material
-                )
+					if old_material != None:
+						material = old_material
+					else:
+						# cant find old material so use default
+						material = utils.findOrCreateDefaultMaterial()
 
-                obj.material_slots[index].material = new_material
-                materials_in_use.append(new_material)
+				# find or clone new material and replace
+				new_material_name = serializeName(obj, material)
+				new_material = utils.findMaterialOrCloneWithName(
+				    new_material_name, material
+				)
 
-            # if no material slots, use default material
-            if len(material_slots) == 0:
-                material = utils.findOrCreateDefaultMaterial()
+				obj.material_slots[index].material = new_material
+				materials_in_use.append(new_material)
 
-                new_material_name = serializeName(obj, material)
-                new_material = utils.findMaterialOrCloneWithName(
-                    new_material_name,
-                    material
-                )
+			# if no material slots, use default material
+			if len(material_slots) == 0:
+				material = utils.findOrCreateDefaultMaterial()
 
-                obj.data.materials.append(new_material)
-                materials_in_use.append(new_material)
+				new_material_name = serializeName(obj, material)
+				new_material = utils.findMaterialOrCloneWithName(
+				    new_material_name, material
+				)
 
-            # add image for baking to the first material 
-            material = obj.material_slots[0].material
-            material.use_nodes = True
-            nodes = material.node_tree.nodes
+				obj.data.materials.append(new_material)
+				materials_in_use.append(new_material)
 
-            for node in nodes:
-                if node.name == MATERIAL_PREFIX:
-                    nodes.remove(node)
+			# add image for baking to the first material
+			material = obj.material_slots[0].material
+			material.use_nodes = True
+			nodes = material.node_tree.nodes
 
-            node = nodes.new("ShaderNodeTexImage")
-            node.name = MATERIAL_PREFIX
-            # node.show_preview = True
-            # node.mute = True
+			for node in nodes:
+				if node.name == MATERIAL_PREFIX:
+					nodes.remove(node)
 
-            new_image_name = MATERIAL_PREFIX + "_" + obj.name
+			node = nodes.new("ShaderNodeTexImage")
+			node.name = MATERIAL_PREFIX
+			# node.show_preview = True
+			# node.mute = True
 
-            for image in bpy.data.images:
-                if image.name == new_image_name:
-                    bpy.data.images.remove(image)
+			new_image_name = MATERIAL_PREFIX + "_" + obj.name
 
-            new_image = bpy.data.images.new(
-                name=MATERIAL_PREFIX + "_" + obj.name, 
-                width=1024,
-                height=1024,
-                alpha=False,
-                float_buffer=True, # TODO: neccessary?
-                # is_data=True
-            )
-            new_image.file_format = "OPEN_EXR"
+			for image in bpy.data.images:
+				if image.name == new_image_name:
+					bpy.data.images.remove(image)
 
-            node.image = new_image
-            images_in_use.append(new_image)
+			new_image = bpy.data.images.new(
+			    name=MATERIAL_PREFIX + "_" + obj.name,
+			    width=1024,
+			    height=1024,
+			    alpha=False,
+			    float_buffer=True,  # TODO: neccessary?
+			    # is_data=True
+			)
+			new_image.file_format = "OPEN_EXR"
 
-            # just for testing
-            # bsdf = nodes["Principled BSDF"]
-            # material.node_tree.links.new(
-            #     node.outputs["Color"],
-            #     bsdf.inputs["Emission"]
-            # )
+			node.image = new_image
+			images_in_use.append(new_image)
 
-        utils.deselectAll() # not being used
-        
-        # remove all unused lightmap materials and textures   
-        for material in bpy.data.materials:
-            if material.name.startswith(MATERIAL_PREFIX) == False:
-                continue
-            if material not in materials_in_use:
-                print("Deleting unused material: " + material.name)
-                bpy.data.materials.remove(material)
+			# just for testing
+			# bsdf = nodes["Principled BSDF"]
+			# material.node_tree.links.new(
+			#     node.outputs["Color"],
+			#     bsdf.inputs["Emission"]
+			# )
 
-        for image in bpy.data.images:
-            if image.name.startswith(MATERIAL_PREFIX) == False:
-                continue
-            if image not in images_in_use:
-                print("Deleting unused image: " + image.name)
-                bpy.data.images.remove(image)
+		utils.deselectAll()  # not being used
 
-                
-        return {"FINISHED"}
+		# remove all unused lightmap materials and textures
+		for material in bpy.data.materials:
+			if material.name.startswith(MATERIAL_PREFIX) == False:
+				continue
+			if material not in materials_in_use:
+				print("Deleting unused material: " + material.name)
+				bpy.data.materials.remove(material)
+
+		for image in bpy.data.images:
+			if image.name.startswith(MATERIAL_PREFIX) == False:
+				continue
+			if image not in images_in_use:
+				print("Deleting unused image: " + image.name)
+				bpy.data.images.remove(image)
+
+		return {"FINISHED"}

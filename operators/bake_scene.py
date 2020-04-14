@@ -3,101 +3,102 @@ import bpy
 from .. import utils
 
 class BakeScene(bpy.types.Operator):
-    bl_idname = "tivoli.bake_scene"
-    bl_label = "Tivoli: Bake Scene"
-    bl_options = {"REGISTER", "UNDO"}
+	bl_idname = "tivoli.bake_scene"
+	bl_label = "Tivoli: Bake Scene"
+	bl_options = {"REGISTER", "UNDO"}
 
-    def execute(self, context):
-        scene = context.scene
-        objects = scene.objects
+	def execute(self, context):
+		scene = context.scene
+		objects = scene.objects
 
-        def getTextureNode(material):
-            for node in material.node_tree.nodes:
-                if node.name.startswith("Tivoli_Lightmap"):
-                    return node
+		def getTextureNode(material):
+			for node in material.node_tree.nodes:
+				if node.name.startswith("Tivoli_Lightmap"):
+					return node
 
-        def unlinkDiffuse(material_slots):
-            old_links = []
+		def unlinkDiffuse(material_slots):
+			old_links = []
 
-            for material_slot in material_slots:
-                material = material_slot.material
-                nodes = material.node_tree.nodes
-                links = material.node_tree.links
-                
-                bsdf = nodes["Principled BSDF"]
+			for material_slot in material_slots:
+				material = material_slot.material
+				nodes = material.node_tree.nodes
+				links = material.node_tree.links
 
-                for link in links:
-                    if link.to_node != bsdf or link.to_socket.name != "Base Color":
-                        continue
+				bsdf = nodes["Principled BSDF"]
 
-                    color = bsdf.inputs["Base Color"].default_value
+				for link in links:
+					if (
+					    link.to_node != bsdf or
+					    link.to_socket.name != "Base Color"
+					):
+						continue
 
-                    old_links.append({
-                        "links": links,
-                        "from": link.from_socket,
-                        "to": link.to_socket,
-                        
-                        "color": color,
-                        # TODO: do this better
-                        "color_r": color[0],
-                        "color_g": color[1],
-                        "color_b": color[2],
-                        "color_a": color[3]
-                    })
+					color = bsdf.inputs["Base Color"].default_value
 
-                    links.remove(link)
-                
-                bsdf.inputs["Base Color"].default_value = (1,1,1,1)
+					old_links.append(
+					    {
+					        "links": links,
+					        "from": link.from_socket,
+					        "to": link.to_socket,
+					        "color": color,
+					        # TODO: do this better
+					        "color_r": color[0],
+					        "color_g": color[1],
+					        "color_b": color[2],
+					        "color_a": color[3],
+					    }
+					)
 
-            return old_links
+					links.remove(link)
 
-        def relinkDiffuse(old_links):
-            for old_link in old_links:
-                old_link["links"].new(
-                    old_link["from"],
-                    old_link["to"]
-                )
-                old_link["color"][0] = old_link["color_r"]
-                old_link["color"][1] = old_link["color_g"]
-                old_link["color"][2] = old_link["color_b"]
-                old_link["color"][3] = old_link["color_a"]
+				bsdf.inputs["Base Color"].default_value = (1, 1, 1, 1)
 
-        bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+			return old_links
 
-        for obj in objects:
-            if not utils.isObjBakeable(obj):
-                continue
+		def relinkDiffuse(old_links):
+			for old_link in old_links:
+				old_link["links"].new(old_link["from"], old_link["to"])
+				old_link["color"][0] = old_link["color_r"]
+				old_link["color"][1] = old_link["color_g"]
+				old_link["color"][2] = old_link["color_b"]
+				old_link["color"][3] = old_link["color_a"]
 
-            print("Baking: " + obj.name)
+		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
-            # select obj
-            utils.deselectAll()
-            obj.select_set(state=True)
-            context.view_layer.objects.active = obj
+		for obj in objects:
+			if not utils.isObjBakeable(obj):
+				continue
 
-            # necessary for diffuse light map
-            # TODO: this must happen for all objects before bake
-            links = unlinkDiffuse(obj.material_slots) 
+			print("Baking: " + obj.name)
 
-            # select texture node
-            first_material = obj.material_slots[0].material
-            node = getTextureNode(first_material)
-            first_material.node_tree.nodes.active = node
+			# select obj
+			utils.deselectAll()
+			obj.select_set(state=True)
+			context.view_layer.objects.active = obj
 
-            # https://docs.blender.org/api/current/bpy.ops.object.html#bpy.ops.object.bake
-            bpy.ops.object.bake(
-                type="COMBINED",
-                # pass_filter={"EMIT","DIRECT","INDIRECT"},
-                uv_layer="Tivoli_Lightmap",
-                # filepath=os.path.join(basedir, obj.name+".png"),
-                # width=128,
-                # height=128,
-                # margin=2,
-                # save_mode="EXTERNAL",
-            )
+			# necessary for diffuse light map
+			# TODO: this must happen for all objects before bake
+			links = unlinkDiffuse(obj.material_slots)
 
-            relinkDiffuse(links)
+			# select texture node
+			first_material = obj.material_slots[0].material
+			node = getTextureNode(first_material)
+			first_material.node_tree.nodes.active = node
 
-        utils.deselectAll()
+			# https://docs.blender.org/api/current/bpy.ops.object.html#bpy.ops.object.bake
+			bpy.ops.object.bake(
+			    type="COMBINED",
+			    # pass_filter={"EMIT","DIRECT","INDIRECT"},
+			    uv_layer="Tivoli_Lightmap",
+			    # filepath=os.path.join(basedir, obj.name+".png"),
+			    # width=128,
+			    # height=128,
+			    # margin=2,
+			    # save_mode="EXTERNAL",
+			)
 
-        return {"FINISHED"}
+			relinkDiffuse(links)
+
+		utils.deselectAll()
+
+		return {"FINISHED"}
