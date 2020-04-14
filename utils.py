@@ -46,5 +46,8 @@ def findObject(name):
 def findObjectFromMaterialName(name):
 	for obj in bpy.context.scene.objects:
 		for material_slot in obj.material_slots:
-			if material_slot.material.name == name:
+			if (
+			    material_slot.material != None and
+			    material_slot.material.name == name
+			):
 				return obj

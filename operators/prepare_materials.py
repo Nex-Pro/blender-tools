@@ -7,6 +7,10 @@ class PrepareMaterials(bpy.types.Operator):
 	bl_label = "Tivoli: Prepare Materials"
 	bl_options = {"REGISTER", "UNDO"}
 
+	restore = bpy.props.BoolProperty(
+	    name="Restore materials", default=False, options={"HIDDEN"}
+	)
+
 	def execute(self, context):
 		scene = context.scene
 		objects = scene.objects
@@ -31,7 +35,10 @@ class PrepareMaterials(bpy.types.Operator):
 			if obj.visible_get() == False or obj.type != "MESH":
 				continue
 
-			print("Preparing materials for: " + obj.name)
+			print(
+			    ("Restoring" if self.restore else "Preparing") +
+			    " materials for: " + obj.name
+			)
 
 			material_slots = obj.material_slots.values()
 
@@ -41,7 +48,10 @@ class PrepareMaterials(bpy.types.Operator):
 				material = material_slot.material
 
 				if material == None:
-					material = utils.findOrCreateDefaultMaterial()
+					if self.restore:
+						continue
+					else:
+						material = utils.findOrCreateDefaultMaterial()
 
 				#  undo tivoli material
 				if material.name.startswith(MATERIAL_PREFIX):
@@ -54,17 +64,20 @@ class PrepareMaterials(bpy.types.Operator):
 						# cant find old material so use default
 						material = utils.findOrCreateDefaultMaterial()
 
-				# find or clone new material and replace
-				new_material_name = serializeName(obj, material)
-				new_material = utils.findMaterialOrCloneWithName(
-				    new_material_name, material
-				)
+				if self.restore:
+					obj.material_slots[index].material = material
+				else:
+					# find or clone new material and replace
+					new_material_name = serializeName(obj, material)
+					new_material = utils.findMaterialOrCloneWithName(
+					    new_material_name, material
+					)
 
-				obj.material_slots[index].material = new_material
-				materials_in_use.append(new_material)
+					obj.material_slots[index].material = new_material
+					materials_in_use.append(new_material)
 
 			# if no material slots, use default material
-			if len(material_slots) == 0:
+			if not self.restore and len(material_slots) == 0:
 				material = utils.findOrCreateDefaultMaterial()
 
 				new_material_name = serializeName(obj, material)
@@ -75,47 +88,49 @@ class PrepareMaterials(bpy.types.Operator):
 				obj.data.materials.append(new_material)
 				materials_in_use.append(new_material)
 
-			# add image for baking to the first material
-			material = obj.material_slots[0].material
-			material.use_nodes = True
-			nodes = material.node_tree.nodes
+			# add image to all materials
+			if not self.restore:
+				new_image_name = MATERIAL_PREFIX + "_" + obj.name
 
-			for node in nodes:
-				if node.name == MATERIAL_PREFIX:
-					nodes.remove(node)
+				for image in bpy.data.images:
+					if image.name == new_image_name:
+						bpy.data.images.remove(image)
 
-			node = nodes.new("ShaderNodeTexImage")
-			node.name = MATERIAL_PREFIX
-			# node.show_preview = True
-			# node.mute = True
+				new_image = bpy.data.images.new(
+				    name=MATERIAL_PREFIX + "_" + obj.name,
+				    width=2048,
+				    height=2048,
+				    alpha=False,
+				    float_buffer=True,  # TODO: neccessary?
+				    # is_data=True
+				)
+				new_image.file_format = "OPEN_EXR"
 
-			new_image_name = MATERIAL_PREFIX + "_" + obj.name
+				for material_slot in obj.material_slots:
+					material = material_slot.material
+					material.use_nodes = True
+					nodes = material.node_tree.nodes
 
-			for image in bpy.data.images:
-				if image.name == new_image_name:
-					bpy.data.images.remove(image)
+					for node in nodes:
+						if node.name == MATERIAL_PREFIX:
+							nodes.remove(node)
 
-			new_image = bpy.data.images.new(
-			    name=MATERIAL_PREFIX + "_" + obj.name,
-			    width=1024,
-			    height=1024,
-			    alpha=False,
-			    float_buffer=True,  # TODO: neccessary?
-			    # is_data=True
-			)
-			new_image.file_format = "OPEN_EXR"
+					node = nodes.new("ShaderNodeTexImage")
+					node.name = MATERIAL_PREFIX
+					# node.show_preview = True
+					# node.mute = True
 
-			node.image = new_image
-			images_in_use.append(new_image)
+					node.image = new_image
+					images_in_use.append(new_image)
 
-			# just for testing
-			# bsdf = nodes["Principled BSDF"]
-			# material.node_tree.links.new(
-			#     node.outputs["Color"],
-			#     bsdf.inputs["Emission"]
-			# )
+					# just for testing
+					# bsdf = nodes["Principled BSDF"]
+					# material.node_tree.links.new(
+					#     node.outputs["Color"],
+					#     bsdf.inputs["Emission"]
+					# )
 
-		utils.deselectAll()  # not being used
+		utils.deselectAll()
 
 		# remove all unused lightmap materials and textures
 		for material in bpy.data.materials:
