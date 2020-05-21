@@ -97,7 +97,7 @@ class PrepareMaterials(bpy.types.Operator):
 						bpy.data.images.remove(image)
 
 				size = int(
-				    list(context.scene.tivoli_settings.texture_size).pop()
+				    list(context.scene.tivoli_settings.bake_texture_size).pop()
 				)
 
 				new_image = bpy.data.images.new(

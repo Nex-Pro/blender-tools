@@ -17,7 +17,7 @@ from .operators.bake_scene import *
 from .operators.export_scene import *
 
 class TivoliSettings(bpy.types.PropertyGroup):
-	texture_size: bpy.props.EnumProperty(
+	bake_texture_size: bpy.props.EnumProperty(
 	    name="Texture size",
 	    items=[
 	        ("128", "128", ""),
@@ -68,7 +68,7 @@ class ToolPanel(bpy.types.Panel):
 		prepare_materials.label(text="Texture size:")
 		prepare_materials.prop(
 		    context.scene.tivoli_settings,
-		    "texture_size",
+		    "bake_texture_size",
 		    expand=True,
 		)
 		prepare_materials.operator(
