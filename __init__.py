@@ -11,12 +11,16 @@ bl_info = {
 
 import bpy
 
-from .operators.prepare_uv_maps import *
-from .operators.prepare_materials import *
+from .operators.bake_prepare_uv_maps import *
+from .operators.bake_prepare_materials import *
 from .operators.bake_scene import *
-from .operators.export_scene import *
+from .operators.bake_export_scene import *
 
 class TivoliSettings(bpy.types.PropertyGroup):
+	bake_expand: bpy.props.BoolProperty(
+	    name="Lightmap baking (don't use!)", default=True
+	)
+
 	bake_texture_size: bpy.props.EnumProperty(
 	    name="Texture size",
 	    items=[
@@ -43,6 +47,10 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    max=101
 	)
 
+	scene_export_expand: bpy.props.BoolProperty(
+	    name="Scene exporting (experimental)", default=True
+	)
+
 class ToolPanel(bpy.types.Panel):
 	bl_idname = "VIEW3D_PT_tivoli"
 	bl_label = "Tivoli Blender Tools"
@@ -53,62 +61,94 @@ class ToolPanel(bpy.types.Panel):
 
 	def draw(self, context):
 		layout = self.layout
+		tivoli_settings = context.scene.tivoli_settings
 
 		bake = layout.box()
-		bake.label(text="1. Prepare UV maps", icon="GROUP_UVS")
-		bake.operator(
-		    # icon="GROUP_UVS",
-		    text="Prepare UV maps",
-		    operator="tivoli.prepare_uv_maps",
+		bake_expand = bake.row()
+		bake_expand.prop(
+		    tivoli_settings,
+		    "bake_expand",
+		    icon="TRIA_DOWN" if tivoli_settings.bake_expand else "TRIA_RIGHT",
+		    emboss=False
 		)
-
-		# prepare materials
-		prepare_materials = layout.box()
-		prepare_materials.label(text="2. Prepare materials", icon="MATERIAL")
-		prepare_materials.label(text="Texture size:")
-		prepare_materials.prop(
-		    context.scene.tivoli_settings,
-		    "bake_texture_size",
-		    expand=True,
-		)
-		prepare_materials.operator(
-		    text="Prepare materials",
-		    operator="tivoli.prepare_materials",
-		).restore = False
-		prepare_materials.operator(
-		    text="Restore materials",
-		    operator="tivoli.prepare_materials",
-		).restore = True
-
-		# bake and export
-		final = layout.box()
-		final.label(text="3. Bake and export", icon="RENDER_STILL")
-		final.operator(
-		    icon="RENDER_STILL",
-		    text="Bake scene",
-		    operator="tivoli.bake_scene"
-		)
-		final.operator(
-		    icon="EXPORT", text="Export scene", operator="tivoli.export_scene"
-		)
-
-		progress = context.scene.tivoli_settings.bake_progress
-		if progress > 0 and progress < 100:
-			bake_progress = layout.box()
-			bake_progress.label(icon="RENDER_STILL", text="Currently baking...")
-			bake_progress.prop(
-			    context.scene.tivoli_settings, "bake_current", text=""
+		if tivoli_settings.bake_expand:
+			uv_maps = bake.box()
+			uv_maps.label(text="1. Prepare UV maps", icon="GROUP_UVS")
+			uv_maps.operator(
+			    # icon="GROUP_UVS",
+			    text="Prepare UV maps",
+			    operator="tivoli.prepare_uv_maps",
 			)
-			bake_progress.prop(
-			    context.scene.tivoli_settings,
-			    "bake_progress",
-			    text="Total bake progress",
-			    slider=True
+
+			# prepare materials
+			prepare_materials = bake.box()
+			prepare_materials.label(
+			    text="2. Prepare materials", icon="MATERIAL"
+			)
+			prepare_materials.label(text="Texture size:")
+			prepare_materials.prop(
+			    tivoli_settings,
+			    "bake_texture_size",
+			    expand=True,
+			)
+			prepare_materials.operator(
+			    text="Prepare materials",
+			    operator="tivoli.prepare_materials",
+			).restore = False
+			prepare_materials.operator(
+			    text="Restore materials",
+			    operator="tivoli.prepare_materials",
+			).restore = True
+
+			# bake and export
+			final = bake.box()
+			final.label(text="3. Bake and export", icon="RENDER_STILL")
+			final.operator(
+			    icon="RENDER_STILL",
+			    text="Bake scene",
+			    operator="tivoli.bake_scene"
+			)
+			final.operator(
+			    icon="EXPORT",
+			    text="Export scene",
+			    operator="tivoli.export_scene"
+			)
+
+			progress = tivoli_settings.bake_progress
+			if progress > 0 and progress < 100:
+				bake_progress = bake.box()
+				bake_progress.label(
+				    icon="RENDER_STILL", text="Currently baking..."
+				)
+				bake_progress.prop(tivoli_settings, "bake_current", text="")
+				bake_progress.prop(
+				    tivoli_settings,
+				    "bake_progress",
+				    text="Total bake progress",
+				    slider=True
+				)
+
+		scene_export = layout.box()
+		scene_export_expand = scene_export.row()
+		scene_export_expand.prop(
+		    tivoli_settings,
+		    "scene_export_expand",
+		    icon="TRIA_DOWN"
+		    if tivoli_settings.scene_export_expand else "TRIA_RIGHT",
+		    emboss=False
+		)
+		if tivoli_settings.scene_export_expand:
+			export = scene_export.box()
+			# export.label(text="1. Prepare UV maps", icon="GROUP_UVS")
+			export.operator(
+			    icon="EXPORT",
+			    text="Export scene to json",
+			    operator="tivoli.prepare_uv_maps",
 			)
 
 classes = (
-    TivoliSettings, PrepareUVMaps, PrepareMaterials, BakeScene, ExportScene,
-    ToolPanel
+    TivoliSettings, BakePrepareUVMaps, BakePrepareMaterials, BakeScene,
+    BakeExportScene, ToolPanel
 )
 
 main_register, main_unregister = bpy.utils.register_classes_factory(classes)
