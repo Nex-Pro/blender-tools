@@ -6,7 +6,7 @@ import json
 from .. import utils
 
 class BakeExportScene(bpy.types.Operator):
-	bl_idname = "tivoli.export_scene"
+	bl_idname = "tivoli.bake_export_scene"
 	bl_label = "Tivoli: Export Scene"
 	bl_options = {"REGISTER", "UNDO"}
 

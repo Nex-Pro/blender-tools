@@ -77,7 +77,7 @@ class ToolPanel(bpy.types.Panel):
 			uv_maps.operator(
 			    # icon="GROUP_UVS",
 			    text="Prepare UV maps",
-			    operator="tivoli.prepare_uv_maps",
+			    operator="tivoli.bake_prepare_uv_maps",
 			)
 
 			# prepare materials
@@ -93,11 +93,11 @@ class ToolPanel(bpy.types.Panel):
 			)
 			prepare_materials.operator(
 			    text="Prepare materials",
-			    operator="tivoli.prepare_materials",
+			    operator="tivoli.bake_prepare_materials",
 			).restore = False
 			prepare_materials.operator(
 			    text="Restore materials",
-			    operator="tivoli.prepare_materials",
+			    operator="tivoli.bake_prepare_materials",
 			).restore = True
 
 			# bake and export
@@ -111,7 +111,7 @@ class ToolPanel(bpy.types.Panel):
 			final.operator(
 			    icon="EXPORT",
 			    text="Export scene",
-			    operator="tivoli.export_scene"
+			    operator="tivoli.bake_export_scene"
 			)
 
 			progress = tivoli_settings.bake_progress

@@ -3,7 +3,7 @@ import bpy
 from .. import utils
 
 class BakePrepareMaterials(bpy.types.Operator):
-	bl_idname = "tivoli.prepare_materials"
+	bl_idname = "tivoli.bake_prepare_materials"
 	bl_label = "Tivoli: Prepare Materials"
 	bl_options = {"REGISTER", "UNDO"}
 

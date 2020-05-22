@@ -3,7 +3,7 @@ import bpy
 from .. import utils
 
 class BakePrepareUVMaps(bpy.types.Operator):
-	bl_idname = "tivoli.prepare_uv_maps"
+	bl_idname = "tivoli.bake_prepare_uv_maps"
 	bl_label = "Tivoli: Prepare UV maps"
 	bl_options = {"REGISTER", "UNDO"}
 
