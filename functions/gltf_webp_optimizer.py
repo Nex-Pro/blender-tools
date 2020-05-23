@@ -18,6 +18,8 @@ def gltf_webp_optimizer(gltf_path):
 	if "images" not in gltf:
 		return
 
+	write_new_gltf = False
+
 	for image in gltf["images"]:
 		filename = image["uri"]
 		if filename.endswith(".webp"):
@@ -44,11 +46,14 @@ def gltf_webp_optimizer(gltf_path):
 			magick.communicate()
 
 			if magick.returncode != 0:
-				return
+				continue
 
 		image["uri"] = webp_filename
+		write_new_gltf = True
 		os.remove(path)
 
 	file.close()
-	file = open(gltf_path, "w")
-	json.dump(gltf, file, indent=4)
+
+	if write_new_gltf:
+		file = open(gltf_path, "w")
+		json.dump(gltf, file, indent=4)
