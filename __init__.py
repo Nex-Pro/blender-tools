@@ -25,6 +25,10 @@ class TivoliSettings(bpy.types.PropertyGroup):
 
 	export_scene_url: bpy.props.StringProperty(name="Export URL", default="")
 
+	export_scene_webp: bpy.props.BoolProperty(
+	    name="WebP texture optimize", default=True
+	)
+
 	# ---
 
 	bake_expand: bpy.props.BoolProperty(
@@ -81,15 +85,12 @@ class ToolPanel(bpy.types.Panel):
 		if tivoli_settings.export_scene_expand:
 			export = export_scene.box()
 			export.label(text="Export URL", icon="URL")
-			export.prop(
-			    tivoli_settings,
-			    "export_scene_url",
-			    text="",
-			)
+			export.prop(tivoli_settings, "export_scene_url", text="")
+			export.prop(tivoli_settings, "export_scene_webp")
 			export.operator(
 			    icon="EXPORT",
 			    text="Export scene to JSON",
-			    operator="tivoli.export_scene",
+			    operator="tivoli.export_scene"
 			)
 
 		# ---

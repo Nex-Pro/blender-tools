@@ -4,6 +4,7 @@ import shutil
 import json
 from mathutils import Vector, Quaternion
 from .. import utils
+from ..functions.gltf_webp_optimizer import *
 
 def vec_swap_yz(vec):
 	return Vector((vec.x, vec.z, vec.y))
@@ -189,6 +190,9 @@ class SceneExport(bpy.types.Operator):
 				    export_texture_dir=textures_dir
 				)
 				bpy.ops.object.delete()
+
+				if scene.tivoli_settings.export_scene_webp:
+					gltf_webp_optimizer(mesh_filepath)
 
 			# gather information
 			url = base_url + mesh_filename
