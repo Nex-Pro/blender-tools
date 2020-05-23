@@ -8,6 +8,8 @@ magick_path = os.path.join(
 if os.name == "nt":
 	magick_path += ".exe"
 
+tivoli_max_texture_size = "8192x8192"
+
 def gltf_webp_optimizer(gltf_path):
 	print("WebP optimizing: " + gltf_path)
 	gltf_dir = os.path.dirname(gltf_path)
@@ -37,7 +39,10 @@ def gltf_webp_optimizer(gltf_path):
 		webp_path = os.path.join(gltf_dir, webp_filename)
 
 		if not os.path.exists(webp_path):
-			magick_args = [magick_path, path, webp_path]
+			magick_args = [
+			    magick_path, path, "-resize", tivoli_max_texture_size + ">",
+			    webp_path
+			]
 			magick = subprocess.Popen(
 			    magick_args,
 			    stdout=subprocess.PIPE,
