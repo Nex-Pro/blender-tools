@@ -70,7 +70,10 @@ def vecMultiply(a, b):
 	return Vector((a[0] * b[0], a[1] * b[1], a[2] * b[2]))
 
 def vecDivide(a, b):
-	return Vector((a[0] / b[0], a[1] / b[1], a[2] / b[2]))
+	try:
+		return Vector((a[0] / b[0], a[1] / b[1], a[2] / b[2]))
+	except ZeroDivisionError:
+		return Vector((0, 0, 0))
 
 def rotateAroundPivot(position, rotation, pivot=Vector((0, 0, 0))):
 	vec = position - pivot
