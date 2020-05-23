@@ -22,10 +22,12 @@ def quat_swap_nzy(q):
 	axis.y = axis_z
 	return Quaternion(axis, angle)
 
-def tivoli_registration_point(obj, as_position_delta=False):
-	bounding_box = [Vector(corner) for corner in obj.bound_box]  # of mesh
-	bounding_box_min = Vector()
-	bounding_box_max = Vector()
+def tivoli_registration_point(obj):
+	bounding_box = [
+	    obj.matrix_world @ Vector(corner) for corner in obj.bound_box
+	]  # of mesh
+	bounding_box_min = Vector(bounding_box[0])
+	bounding_box_max = Vector(bounding_box[0])
 	for corner in bounding_box:
 		if corner.x < bounding_box_min.x:
 			bounding_box_min.x = corner.x
