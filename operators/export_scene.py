@@ -185,6 +185,7 @@ class SceneExport(bpy.types.Operator):
 				    export_format="GLTF_SEPARATE",
 				    export_selected=True,
 				    export_apply=True,
+				    # TODO: duplicate image names will overwrite each other
 				    export_texture_dir=textures_dir
 				)
 				bpy.ops.object.delete()
