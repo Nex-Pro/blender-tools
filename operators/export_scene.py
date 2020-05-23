@@ -254,6 +254,8 @@ class SceneExport(bpy.types.Operator):
 		# write to json
 		filepath = os.path.join(project_export_dir, project_name) + ".json"
 		with open(filepath, "w") as file:
-			json.dump(export, file, indent=4)
+			# json.dump(export, file, indent=4)
+			# the json file can get very big
+			json.dump(export, file)
 
 		return {"FINISHED"}
