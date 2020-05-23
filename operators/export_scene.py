@@ -192,6 +192,10 @@ class SceneExport(bpy.types.Operator):
 
 			# gather information
 			url = base_url + mesh_filename
+			if url.startswith("file://"):
+				url = url.replace("\\", "/")
+			if os.name == "nt":
+				url = url.replace("file://", "file:///")
 
 			matrix = obj.matrix_world
 
