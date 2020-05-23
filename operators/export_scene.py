@@ -24,7 +24,7 @@ def quat_swap_nzy(q):
 
 def tivoli_registration_point(obj):
 	bounding_box = [
-	    obj.matrix_world @ Vector(corner) for corner in obj.bound_box
+	    vec_swap_yz(Vector(corner)) for corner in obj.bound_box
 	]  # of mesh
 	bounding_box_min = Vector(bounding_box[0])
 	bounding_box_max = Vector(bounding_box[0])
@@ -41,9 +41,6 @@ def tivoli_registration_point(obj):
 			bounding_box_max.y = corner.y
 		if corner.z > bounding_box_max.z:
 			bounding_box_max.z = corner.z
-
-	bounding_box_min = vec_swap_yz(bounding_box_min)
-	bounding_box_max = vec_swap_yz(bounding_box_max)
 
 	origin = (bounding_box_min + bounding_box_max) / 2
 	dimensions = bounding_box_max - bounding_box_min
