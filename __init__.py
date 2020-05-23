@@ -16,9 +16,19 @@ from .operators.bake_prepare_materials import *
 from .operators.bake_scene import *
 from .operators.bake_export_scene import *
 
+from .operators.export_scene import *
+
 class TivoliSettings(bpy.types.PropertyGroup):
+	export_scene_expand: bpy.props.BoolProperty(
+	    name="Export scene", default=False
+	)
+
+	export_scene_url: bpy.props.StringProperty(name="Export URL", default="")
+
+	# ---
+
 	bake_expand: bpy.props.BoolProperty(
-	    name="Lightmap baking (don't use!)", default=True
+	    name="Lightmap baking (don't use!)", default=False
 	)
 
 	bake_texture_size: bpy.props.EnumProperty(
@@ -47,10 +57,6 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    max=101
 	)
 
-	scene_export_expand: bpy.props.BoolProperty(
-	    name="Scene exporting (experimental)", default=True
-	)
-
 class ToolPanel(bpy.types.Panel):
 	bl_idname = "VIEW3D_PT_tivoli"
 	bl_label = "Tivoli Blender Tools"
@@ -62,6 +68,31 @@ class ToolPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		tivoli_settings = context.scene.tivoli_settings
+
+		export_scene = layout.box()
+		export_scene_expand = export_scene.row()
+		export_scene_expand.prop(
+		    tivoli_settings,
+		    "export_scene_expand",
+		    icon="TRIA_DOWN"
+		    if tivoli_settings.export_scene_expand else "TRIA_RIGHT",
+		    emboss=False
+		)
+		if tivoli_settings.export_scene_expand:
+			export = export_scene.box()
+			export.label(text="Export URL", icon="URL")
+			export.prop(
+			    tivoli_settings,
+			    "export_scene_url",
+			    text="",
+			)
+			export.operator(
+			    icon="EXPORT",
+			    text="Export scene to JSON",
+			    operator="tivoli.export_scene",
+			)
+
+		# ---
 
 		bake = layout.box()
 		bake_expand = bake.row()
@@ -128,27 +159,9 @@ class ToolPanel(bpy.types.Panel):
 				    slider=True
 				)
 
-		scene_export = layout.box()
-		scene_export_expand = scene_export.row()
-		scene_export_expand.prop(
-		    tivoli_settings,
-		    "scene_export_expand",
-		    icon="TRIA_DOWN"
-		    if tivoli_settings.scene_export_expand else "TRIA_RIGHT",
-		    emboss=False
-		)
-		if tivoli_settings.scene_export_expand:
-			export = scene_export.box()
-			# export.label(text="1. Prepare UV maps", icon="GROUP_UVS")
-			export.operator(
-			    icon="EXPORT",
-			    text="Export scene to json",
-			    operator="tivoli.prepare_uv_maps",
-			)
-
 classes = (
     TivoliSettings, BakePrepareUVMaps, BakePrepareMaterials, BakeScene,
-    BakeExportScene, ToolPanel
+    BakeExportScene, SceneExport, ToolPanel
 )
 
 main_register, main_unregister = bpy.utils.register_classes_factory(classes)

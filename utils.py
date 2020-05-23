@@ -1,10 +1,21 @@
 import bpy
+from uuid import uuid4
+from mathutils import Vector
 
 def isObjBakeable(obj):
 	return obj.visible_get() == True and obj.type == "MESH"
 
 def deselectAll():
 	bpy.ops.object.select_all(action="DESELECT")
+
+def deselectAllOutliner(context):
+	for window in bpy.context.window_manager.windows:
+		screen = window.screen
+		for area in screen.areas:
+			if area.type == "OUTLINER":
+				override = {"window": window, "screen": screen, "area": area}
+				bpy.ops.outliner.select_all(override, action="DESELECT")
+				break
 
 def selectOnly(obj):
 	deselectAll()
@@ -51,3 +62,17 @@ def findObjectFromMaterialName(name):
 			    material_slot.material.name == name
 			):
 				return obj
+
+def tivoliUuid():
+	return "{" + str(uuid4()) + "}"
+
+def vecMultiply(a, b):
+	return Vector((a[0] * b[0], a[1] * b[1], a[2] * b[2]))
+
+def vecDivide(a, b):
+	return Vector((a[0] / b[0], a[1] / b[1], a[2] / b[2]))
+
+def rotateAroundPivot(position, rotation, pivot=Vector((0, 0, 0))):
+	vec = position - pivot
+	vec.rotate(rotation)
+	return vec
