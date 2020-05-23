@@ -80,6 +80,21 @@ def tivoli_quat(quat):
 	    "w": quat.w,
 	}
 
+def tivoli_empty(name, position=Vector(), rotation=Quaternion()):
+	return {
+	    "id": utils.tivoliUuid(),
+	    "type": "Box",
+	    "visible": False,
+	    "name": name,
+	    "position": tivoli_vec(position),
+	    "dimensions": tivoli_vec(Vector()),
+	    "rotation": tivoli_quat(rotation),
+	    "grab": {
+	        "grabbable": False
+	    },
+	    "shape": "Cube",
+	}
+
 class SceneExport(bpy.types.Operator):
 	bl_idname = "tivoli.export_scene"
 	bl_label = "Tivoli: Export scene to JSON"
@@ -165,6 +180,9 @@ class SceneExport(bpy.types.Operator):
 
 		export = {"Id": utils.tivoliUuid(), "Version": 129, "Entities": []}
 
+		root_entity = tivoli_empty(project_name)
+		export["Entities"].append(root_entity)
+
 		for obj in objects:
 			mesh = obj.data
 
@@ -214,7 +232,7 @@ class SceneExport(bpy.types.Operator):
 			    {
 			        "id": utils.tivoliUuid(),
 			        "type": "Model",
-			        # "parentID": "",
+			        "parentID": root_entity["id"],
 			        "name": obj.name,
 			        "position": tivoli_vec(position),
 			        "dimensions": tivoli_vec(dimensions),
