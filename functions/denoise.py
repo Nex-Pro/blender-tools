@@ -93,8 +93,12 @@ def denoise(image):
 		savePfm(file, original_array)
 
 	# run oidn
-	# TODO: use oidn stored in git repo and write how to in readme
-	oidn_path = "/home/maki/oidn/bin/denoise"
+	oidn_path = os.path.join(
+	    os.path.dirname(os.path.realpath(__file__)), "../libs/oidn/bin/denoise"
+	)
+	if os.name == "nt":
+		oidn_path += ".exe"
+
 	oidn_args = [
 	    oidn_path + " -f RTLightmap --hdr " + original_dest + " -o " +
 	    denoised_dest
