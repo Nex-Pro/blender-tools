@@ -97,12 +97,12 @@ class ExportScene(bpy.types.Operator):
 	bl_label = "Tivoli: Export scene to JSON"
 	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
-	webp_textures: bpy.props.BoolProperty(
-	    name="WebP textures", default=False, options={"HIDDEN"}
-	)
-
 	base_url: bpy.props.StringProperty(
 	    name="Base URL", default="", options={"HIDDEN"}
+	)
+
+	webp_textures: bpy.props.BoolProperty(
+	    name="WebP textures", default=False, options={"HIDDEN"}
 	)
 
 	def execute(self, context):
