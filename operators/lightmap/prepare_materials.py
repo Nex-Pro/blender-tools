@@ -1,4 +1,6 @@
 import bpy
+import bmesh
+import math
 
 from ... import utils
 
@@ -7,6 +9,7 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 	bl_label = "Tivoli: Lightmap Prepare Materials"
 	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
+	# TODO: clicking restore multiple times crashes
 	restore: bpy.props.BoolProperty(
 	    name="Restore materials", default=False, options={"HIDDEN"}
 	)
@@ -96,9 +99,26 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 					if image.name == new_image_name:
 						bpy.data.images.remove(image)
 
-				size = int(
-				    list(context.scene.tivoli_settings.bake_texture_size).pop()
-				)
+				if scene.tivoli_settings.bake_automatic_texture_size:
+					# mesh = bmesh.new()
+					# mesh.from_mesh(obj.data)
+					# bmesh.ops.transform(
+					#     mesh, matrix=obj.matrix_world, verts=mesh.verts
+					# )
+					# area = sum(f.calc_area() for f in mesh.faces)
+
+					scale = obj.dimensions.x + obj.dimensions.y + obj.dimensions.z
+
+					size = math.floor(scale * 96)
+					if size > 8192:
+						size = 8192
+
+					print(size)
+				else:
+					size = int(
+					    list(context.scene.tivoli_settings.bake_texture_size
+					        ).pop()
+					)
 
 				new_image = bpy.data.images.new(
 				    name=MATERIAL_PREFIX + "_" + obj.name,

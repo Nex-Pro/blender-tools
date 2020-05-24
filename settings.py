@@ -8,6 +8,9 @@ class TivoliSettings(bpy.types.PropertyGroup):
 
 	# ---
 
+	bake_automatic_texture_size: bpy.props.BoolProperty(
+	    name="Auto texture size", default=True
+	)
 	bake_texture_size: bpy.props.EnumProperty(
 	    name="Texture size",
 	    items=[
