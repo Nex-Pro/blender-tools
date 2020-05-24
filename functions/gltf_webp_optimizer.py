@@ -2,12 +2,14 @@ import os
 import json
 import subprocess
 import threading
+from .. import utils
 
-magick_path = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), "../libs/magick"
-)
-if os.name == "nt":
-	magick_path += ".exe"
+if os.name == "posix":
+	magick_path = utils.which("magick")
+elif os.name == "nt":
+	magick_path = os.path.join(
+	    os.path.dirname(os.path.realpath(__file__)), "../libs/magick"
+	) + ".exe"
 
 tivoli_max_texture_size = "8192x8192"
 

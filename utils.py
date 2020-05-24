@@ -1,4 +1,5 @@
 import bpy
+import subprocess
 from uuid import uuid4
 from mathutils import Vector
 
@@ -79,3 +80,6 @@ def rotateAroundPivot(position, rotation, pivot=Vector((0, 0, 0))):
 	vec = position - pivot
 	vec.rotate(rotation)
 	return vec
+
+def which(program):
+	return subprocess.check_output(["which", program]).decode("utf-8").strip()

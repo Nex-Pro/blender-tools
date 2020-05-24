@@ -61,12 +61,13 @@ def download_imagemagic():
 	magick_url = "https://imagemagick.org/download/binaries/"
 
 	if os.name == "posix":
-		magick_path = download(magick_url + "magick", libs_dir)
-		subprocess.Popen(
-		    ["chmod", "+x", magick_path],
-		    stdout=subprocess.PIPE,
-		    stderr=subprocess.PIPE
-		)
+		# TODO: --version doesn't show webp. users will have to system install
+		# magick_path = download(magick_url + "magick", libs_dir)
+		# subprocess.Popen(
+		#     ["chmod", "+x", magick_path],
+		#     stdout=subprocess.PIPE,
+		#     stderr=subprocess.PIPE
+		# )
 	elif os.name == "nt":
 		magick_archive_path = download(
 		    magick_url + "ImageMagick-7.0.10-13-portable-Q16-x64.zip", libs_dir
