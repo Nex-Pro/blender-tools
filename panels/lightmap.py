@@ -2,7 +2,7 @@ import bpy
 
 class LightmapPanel(bpy.types.Panel):
 	bl_idname = "VIEW3D_PT_tivoli_lightmap_baking"
-	bl_label = "Lightmap baking (don't use)"
+	bl_label = "Lightmap baking"
 	bl_icon = "OBJECT_DATA"
 	bl_category = "Tivoli"
 
@@ -12,6 +12,12 @@ class LightmapPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		tivoli_settings = context.scene.tivoli_settings
+
+		layout.label(icon="ERROR", text="Warning!")
+		caution = layout.column(align=True)
+		caution.label(text="Please use with all caution")
+		caution.label(text="This is experimental and may not work")
+		caution.label(text="Make a copy of your project first!")
 
 		# uv maps
 		uv_maps = layout.box()
@@ -50,7 +56,8 @@ class LightmapPanel(bpy.types.Panel):
 		export = layout.box()
 		export.label(text="4. Export", icon="EXPORT")
 		export.operator(
-		    text="Export scene", operator="tivoli.lightmap_export_scene"
+		    text="Export scene as GLTF",
+		    operator="tivoli.lightmap_export_scene"
 		)
 
 		progress = tivoli_settings.bake_progress
