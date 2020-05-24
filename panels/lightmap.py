@@ -31,12 +31,14 @@ class LightmapPanel(bpy.types.Panel):
 		# prepare materials
 		prepare_materials = layout.box()
 		prepare_materials.label(text="2. Prepare materials", icon="MATERIAL")
-		prepare_materials.label(text="Texture size:")
-		prepare_materials.prop(
-		    tivoli_settings,
-		    "bake_texture_size",
-		    expand=True,
-		)
+
+		prepare_materials.prop(tivoli_settings, "bake_automatic_texture_size")
+		if not tivoli_settings.bake_automatic_texture_size:
+			prepare_materials.label(text="Manual texture size:")
+			prepare_materials.prop(
+			    tivoli_settings, "bake_texture_size", expand=True
+			)
+
 		prepare_materials.operator(
 		    text="Prepare materials",
 		    operator="tivoli.lightmap_prepare_materials",
@@ -52,6 +54,19 @@ class LightmapPanel(bpy.types.Panel):
 		bake.prop(tivoli_settings, "bake_oidn")
 		bake.operator(text="Bake scene", operator="tivoli.lightmap_bake_scene")
 
+		progress = tivoli_settings.bake_progress
+		if progress >= 0 and progress <= 100:
+			progress = bake.box()
+			progress.label(text="Currently baking...")
+			progress.prop(tivoli_settings, "bake_current")
+			progress.prop(tivoli_settings, "bake_current_texture_size")
+			progress.prop(
+			    tivoli_settings,
+			    "bake_progress",
+			    text="Total bake progress",
+			    slider=True
+			)
+
 		# export
 		export = layout.box()
 		export.label(text="4. Export", icon="EXPORT")
@@ -60,15 +75,3 @@ class LightmapPanel(bpy.types.Panel):
 		    text="Export scene as GLTF",
 		    operator="tivoli.lightmap_export_scene"
 		)
-
-		progress = tivoli_settings.bake_progress
-		if progress > 0 and progress < 100:
-			bake_progress = layout.box()
-			bake_progress.label(icon="RENDER_STILL", text="Currently baking...")
-			bake_progress.prop(tivoli_settings, "bake_current", text="")
-			bake_progress.prop(
-			    tivoli_settings,
-			    "bake_progress",
-			    text="Total bake progress",
-			    slider=True
-			)

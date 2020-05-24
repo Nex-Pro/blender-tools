@@ -34,13 +34,10 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    name="WebP texture optimize", default=True
 	)
 
-	bake_current: bpy.props.StringProperty(name="Bake current", default="")
+	bake_current: bpy.props.StringProperty(name="Object", default="")
+	bake_current_texture_size: bpy.props.StringProperty(
+	    name="Tex. Size", default=""
+	)
 	bake_progress: bpy.props.FloatProperty(
-	    name="Bake progress",
-	    default=-1,
-	    subtype="PERCENTAGE",
-	    min=-1,
-	    soft_min=0,
-	    soft_max=100,
-	    max=101
+	    name="Bake progress", default=-1, subtype="PERCENTAGE", min=-1, max=100
 	)
