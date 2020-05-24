@@ -30,9 +30,13 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    name="Denoise with Intel® OIDN", default=True
 	)
 
-	bake_webp: bpy.props.BoolProperty(
+	bake_export_as_json: bpy.props.BoolProperty(
+	    name="Export scene as JSON", default=True
+	)
+	bake_export_webp: bpy.props.BoolProperty(
 	    name="WebP texture optimize", default=True
 	)
+	bake_export_url: bpy.props.StringProperty(name="Export URL", default="")
 
 	bake_current: bpy.props.StringProperty(name="Object", default="")
 	bake_current_texture_size: bpy.props.StringProperty(

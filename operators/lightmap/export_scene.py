@@ -11,6 +11,18 @@ class LightmapExportScene(bpy.types.Operator):
 	bl_label = "Tivoli: Lightmap Export Scene"
 	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
+	base_url: bpy.props.StringProperty(
+	    name="Base URL", default="", options={"HIDDEN"}
+	)
+
+	webp_textures: bpy.props.BoolProperty(
+	    name="WebP textures", default=False, options={"HIDDEN"}
+	)
+
+	as_json: bpy.props.BoolProperty(
+	    name="Export as JSON", default=False, options={"HIDDEN"}
+	)
+
 	def execute(self, context):
 		scene = context.scene
 
@@ -28,22 +40,28 @@ class LightmapExportScene(bpy.types.Operator):
 		project_dir = os.path.dirname(bpy.data.filepath)
 		export_dir = os.path.join(project_dir, project_name)
 
-		if os.path.exists(export_dir):
-			shutil.rmtree(export_dir)
-		os.makedirs(export_dir)
+		if self.as_json:
+			bpy.ops.tivoli.export_scene(
+			    webp_textures=self.webp_textures,
+			    base_url=self.base_url,
+			)
+		else:
+			if os.path.exists(export_dir):
+				shutil.rmtree(export_dir)
+			os.makedirs(export_dir)
 
-		filepath = os.path.join(export_dir, project_name) + ".gltf"
+			filepath = os.path.join(export_dir, project_name) + ".gltf"
 
-		bpy.ops.object.select_all(action="SELECT")
+			bpy.ops.object.select_all(action="SELECT")
 
-		bpy.ops.export_scene.gltf(
-		    export_format="GLTF_SEPARATE",
-		    export_copyright="Tivoli Cloud VR, Inc.",
-		    export_image_format="JPEG",
-		    export_selected=True,
-		    export_apply=True,
-		    filepath=filepath,
-		)
+			bpy.ops.export_scene.gltf(
+			    export_format="GLTF_SEPARATE",
+			    export_copyright="Tivoli Cloud VR, Inc.",
+			    # export_image_format="JPEG",
+			    export_selected=True,
+			    export_apply=True,
+			    filepath=filepath,
+			)
 
 		# export lightmap images
 		for image in bpy.data.images:
@@ -55,7 +73,7 @@ class LightmapExportScene(bpy.types.Operator):
 
 			export_path = os.path.join(export_dir, image.name)
 
-			if scene.tivoli_settings.bake_webp:
+			if self.webp_textures:
 				# dont convert image
 				image.filepath_raw = export_path + "." + utils.imageExt(image)
 				image.save()
@@ -69,62 +87,72 @@ class LightmapExportScene(bpy.types.Operator):
 			image.file_format = previous_file_format
 
 		# modify gltf
-		file = open(filepath, "r")
-		data = json.load(file)
-		file.close()
+		def modify_gltf(filepath):
+			file = open(filepath, "r")
+			data = json.load(file)
+			file.close()
 
-		def addTexture(image):
-			if "images" not in data:
-				data["images"] = []
-			if "textures" not in data:
-				data["textures"] = []
+			def addTexture(image):
+				if "images" not in data:
+					data["images"] = []
+				if "textures" not in data:
+					data["textures"] = []
 
-			if scene.tivoli_settings.bake_webp:
-				data["images"].append(
-				    {
-				        "mimeType": "",  # will be written by optimizer
-				        "name": image.name,
-				        "uri": image.name + "." + utils.imageExt(image),
-				    }
-				)
-			else:
-				data["images"].append(
-				    {
-				        "mimeType": LIGHTMAP_MIMETYPE,
-				        "name": image.name,
-				        "uri": image.name + LIGHTMAP_EXT,
-				    }
-				)
+				if self.webp_textures:
+					data["images"].append(
+					    {
+					        "mimeType": "",  # will be written by optimizer
+					        "name": image.name,
+					        "uri": image.name + "." + utils.imageExt(image),
+					    }
+					)
+				else:
+					data["images"].append(
+					    {
+					        "mimeType": LIGHTMAP_MIMETYPE,
+					        "name": image.name,
+					        "uri": image.name + LIGHTMAP_EXT,
+					    }
+					)
 
-			source = len(data["images"]) - 1
+				source = len(data["images"]) - 1
 
-			data["textures"].append({"source": source})
-			index = len(data["textures"]) - 1
+				data["textures"].append({"source": source})
+				index = len(data["textures"]) - 1
 
-			return index
+				return index
 
-		for material in data["materials"]:
-			obj = utils.findObjectFromMaterialName(material["name"])
+			for material in data["materials"]:
+				obj = utils.findObjectFromMaterialName(material["name"])
 
-			image_name = "Tivoli_Lightmap_" + obj.name
-			image = utils.findImage(image_name)
-			texture_index = addTexture(image)
+				image_name = "Tivoli_Lightmap_" + obj.name
+				image = utils.findImage(image_name)
+				texture_index = addTexture(image)
 
-			print(image_name)
-			print(texture_index)
+				print(image_name)
+				print(texture_index)
 
-			material["lightmapTexture"] = {
-			    "index": texture_index,
-			    "texCoord": 1,
-			}
+				material["lightmapTexture"] = {
+				    "index": texture_index,
+				    "texCoord": 1,
+				}
 
-		# export gltf
-		file = open(filepath, "w")
-		json.dump(data, file, indent=4)
-		file.close()
+			# export gltf
+			file = open(filepath, "w")
+			json.dump(data, file, indent=4)
+			file.close()
 
-		if scene.tivoli_settings.bake_webp:
-			gltf_webp_optimizer(filepath, quality=90)
+			if self.webp_textures:
+				gltf_webp_optimizer(filepath, quality=90)
+
+		if self.as_json:
+			for filename in os.listdir(export_dir):
+				ext = filename.split(".").pop().lower()
+				if ext == "gltf":
+					filepath = os.path.join(export_dir, filename)
+					modify_gltf(filepath)
+		else:
+			modify_gltf(filepath)
 
 		utils.deselectAll()
 
