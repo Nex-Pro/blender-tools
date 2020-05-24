@@ -20,4 +20,4 @@ class ExportScenePanel(bpy.types.Panel):
 		    icon="EXPORT",
 		    text="Export scene to JSON",
 		    operator="tivoli.export_scene"
-		)
+		).webp_textures = tivoli_settings.export_scene_webp

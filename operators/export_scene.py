@@ -97,6 +97,10 @@ class ExportScene(bpy.types.Operator):
 	bl_label = "Tivoli: Export scene to JSON"
 	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
+	webp_textures: bpy.props.BoolProperty(
+	    name="WebP textures", default=False, options={"HIDDEN"}
+	)
+
 	def execute(self, context):
 		if not bpy.data.is_saved:
 			raise Exception("Save first before exporting")
@@ -208,7 +212,7 @@ class ExportScene(bpy.types.Operator):
 				)
 				bpy.ops.object.delete()
 
-				if scene.tivoli_settings.export_scene_webp:
+				if self.webp_textures:
 					gltf_webp_optimizer(mesh_filepath)
 
 			# gather information
