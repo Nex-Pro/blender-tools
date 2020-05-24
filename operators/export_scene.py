@@ -101,6 +101,10 @@ class ExportScene(bpy.types.Operator):
 	    name="WebP textures", default=False, options={"HIDDEN"}
 	)
 
+	base_url: bpy.props.StringProperty(
+	    name="Base URL", default="", options={"HIDDEN"}
+	)
+
 	def execute(self, context):
 		if not bpy.data.is_saved:
 			raise Exception("Save first before exporting")
@@ -124,7 +128,7 @@ class ExportScene(bpy.types.Operator):
 		textures_dir = os.path.join(project_export_dir)
 
 		# make export dir
-		base_url = scene.tivoli_settings.export_scene_url.strip()
+		base_url = self.base_url.strip()
 		if base_url == "":
 			base_url = "file://" + project_export_dir
 		if not base_url.endswith("/"):
