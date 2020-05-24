@@ -48,11 +48,18 @@ class LightmapExportScene(bpy.types.Operator):
 			if image.name.startswith("Tivoli_Lightmap_") == False:
 				continue
 
+			previous_filepath_raw = image.filepath_raw
+			previous_file_format = image.file_format
+
 			image.filepath_raw = (
 			    os.path.join(export_dir, image.name) + LIGHTMAP_EXT
 			)
 			image.file_format = LIGHTMAP_TYPE
 			image.save()
+
+			# restore image
+			image.filepath_raw = previous_filepath_raw
+			image.file_format = previous_file_format
 
 		# modify gltf
 		with open(filepath, "r") as file:
