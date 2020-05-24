@@ -1,5 +1,6 @@
 import bpy
 import threading
+import os
 
 from ... import utils
 from ...functions.denoise import *
@@ -12,6 +13,10 @@ class LightmapBakeScene(bpy.types.Operator):
 	def execute(self, context):
 		scene = context.scene
 		objects = scene.objects
+
+		tmp_dir = os.path.join(os.path.dirname(bpy.data.filepath), "tmp")
+		if not os.path.exists(tmp_dir):
+			os.makedirs(tmp_dir)
 
 		def getLightmapNode(material):
 			for node in material.node_tree.nodes:
@@ -120,10 +125,16 @@ class LightmapBakeScene(bpy.types.Operator):
 			    # save_mode="EXTERNAL",
 			)
 
+			# save image otherwise it all gets allocated in the memory
+			image = getLightmapNode(obj.material_slots[0].material).image
+
 			# denoise
 			if scene.tivoli_settings.bake_oidn:
-				image = getLightmapNode(obj.material_slots[0].material).image
 				denoise(image)
+
+			image.filepath_raw = os.path.join(tmp_dir, image.name) + ".hdr"
+			image.file_format = "HDR"
+			image.save()
 
 			# update current index and text
 			render["current_object_index"] += 1

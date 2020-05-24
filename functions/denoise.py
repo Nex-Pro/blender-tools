@@ -116,15 +116,3 @@ def denoise(image):
 	ndata2 = numpy.dstack((ndata, numpy.ones((width, height))))
 	denoised_array = ndata2.ravel()
 	bpy.data.images[image.name].pixels = denoised_array
-
-	tmp_dir = os.path.join(os.path.dirname(bpy.data.filepath), "tmp")
-	if not os.path.exists(tmp_dir):
-		os.makedirs(tmp_dir)
-
-	image = bpy.data.images[image.name]
-	# image.filepath_raw = os.path.join(tmp_dir, image.name) + ".exr"
-	# image.file_format = "OPEN_EXR"
-	# HDR has a smaller file size
-	image.filepath_raw = os.path.join(tmp_dir, image.name) + ".hdr"
-	image.file_format = "HDR"
-	image.save()
