@@ -1,12 +1,12 @@
 import bpy
 import threading
 
-from .. import utils
-from ..functions.denoise import *
+from ... import utils
+from ...functions.denoise import *
 
-class BakeScene(bpy.types.Operator):
-	bl_idname = "tivoli.bake_scene"
-	bl_label = "Tivoli: Bake Scene"
+class LightmapBakeScene(bpy.types.Operator):
+	bl_idname = "tivoli.lightmap_bake_scene"
+	bl_label = "Tivoli: Lightmap Bake Scene"
 	bl_options = {"REGISTER", "UNDO"}
 
 	def execute(self, context):

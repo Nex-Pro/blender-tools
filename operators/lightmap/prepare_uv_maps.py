@@ -1,10 +1,10 @@
 import bpy
 
-from .. import utils
+from ... import utils
 
-class BakePrepareUVMaps(bpy.types.Operator):
-	bl_idname = "tivoli.bake_prepare_uv_maps"
-	bl_label = "Tivoli: Prepare UV maps"
+class LightmapPrepareUVMaps(bpy.types.Operator):
+	bl_idname = "tivoli.lightmap_prepare_uv_maps"
+	bl_label = "Tivoli: Lightmap Prepare UV maps"
 	bl_options = {"REGISTER", "UNDO"}
 
 	def execute(self, context):

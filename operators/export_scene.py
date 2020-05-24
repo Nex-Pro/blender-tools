@@ -92,7 +92,7 @@ def tivoli_empty(name, position=Vector(), rotation=Quaternion()):
 	    "shape": "Cube",
 	}
 
-class SceneExport(bpy.types.Operator):
+class ExportScene(bpy.types.Operator):
 	bl_idname = "tivoli.export_scene"
 	bl_label = "Tivoli: Export scene to JSON"
 	bl_options = {"REGISTER", "UNDO"}

@@ -3,11 +3,11 @@ import os
 import shutil
 import json
 
-from .. import utils
+from ... import utils
 
-class BakeExportScene(bpy.types.Operator):
-	bl_idname = "tivoli.bake_export_scene"
-	bl_label = "Tivoli: Export Scene"
+class LightmapExportScene(bpy.types.Operator):
+	bl_idname = "tivoli.lightmap_export_scene"
+	bl_label = "Tivoli: Lightmap Export Scene"
 	bl_options = {"REGISTER", "UNDO"}
 
 	def execute(self, context):

@@ -1,13 +1,13 @@
 import bpy
 
-from .. import utils
+from ... import utils
 
-class BakePrepareMaterials(bpy.types.Operator):
-	bl_idname = "tivoli.bake_prepare_materials"
-	bl_label = "Tivoli: Prepare Materials"
+class LightmapPrepareMaterials(bpy.types.Operator):
+	bl_idname = "tivoli.lightmap_prepare_materials"
+	bl_label = "Tivoli: Lightmap Prepare Materials"
 	bl_options = {"REGISTER", "UNDO"}
 
-	restore = bpy.props.BoolProperty(
+	restore: bpy.props.BoolProperty(
 	    name="Restore materials", default=False, options={"HIDDEN"}
 	)
 
