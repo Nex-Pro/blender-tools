@@ -123,6 +123,7 @@ class LightmapBakeScene(bpy.types.Operator):
 			    # height=128,
 			    # margin=2,
 			    # save_mode="EXTERNAL",
+			    margin=8192
 			)
 
 			# save image otherwise it all gets allocated in the memory
