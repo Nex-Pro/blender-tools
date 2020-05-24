@@ -35,6 +35,7 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 
 	file = open(gltf_path, "r")
 	gltf = json.load(file)
+	file.close()
 
 	if "images" not in gltf:
 		return
@@ -73,8 +74,6 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 		image["uri"] = webp_filename
 		write_new_gltf = True
 
-	file.close()
-
 	threads = []
 	for command in commands:
 		thread = ThreadedCommand(command)
@@ -89,3 +88,4 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 	if len(old_images) > 0:
 		file = open(gltf_path, "w")
 		json.dump(gltf, file, indent=4)
+		file.close()
