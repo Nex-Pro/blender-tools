@@ -5,7 +5,7 @@ from ... import utils
 class LightmapPrepareUVMaps(bpy.types.Operator):
 	bl_idname = "tivoli.lightmap_prepare_uv_maps"
 	bl_label = "Tivoli: Lightmap Prepare UV maps"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
 	def execute(self, context):
 		scene = context.scene

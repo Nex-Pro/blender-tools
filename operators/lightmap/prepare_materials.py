@@ -5,7 +5,7 @@ from ... import utils
 class LightmapPrepareMaterials(bpy.types.Operator):
 	bl_idname = "tivoli.lightmap_prepare_materials"
 	bl_label = "Tivoli: Lightmap Prepare Materials"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
 	restore: bpy.props.BoolProperty(
 	    name="Restore materials", default=False, options={"HIDDEN"}

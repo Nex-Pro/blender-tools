@@ -7,7 +7,7 @@ from ...functions.denoise import *
 class LightmapBakeScene(bpy.types.Operator):
 	bl_idname = "tivoli.lightmap_bake_scene"
 	bl_label = "Tivoli: Lightmap Bake Scene"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
 	def execute(self, context):
 		scene = context.scene

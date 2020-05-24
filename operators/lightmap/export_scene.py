@@ -8,7 +8,7 @@ from ... import utils
 class LightmapExportScene(bpy.types.Operator):
 	bl_idname = "tivoli.lightmap_export_scene"
 	bl_label = "Tivoli: Lightmap Export Scene"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
 	def execute(self, context):
 

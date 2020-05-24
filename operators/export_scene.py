@@ -95,7 +95,7 @@ def tivoli_empty(name, position=Vector(), rotation=Quaternion()):
 class ExportScene(bpy.types.Operator):
 	bl_idname = "tivoli.export_scene"
 	bl_label = "Tivoli: Export scene to JSON"
-	bl_options = {"REGISTER", "UNDO"}
+	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
 	def execute(self, context):
 		if not bpy.data.is_saved:
