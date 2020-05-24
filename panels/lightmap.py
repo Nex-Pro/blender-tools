@@ -40,19 +40,19 @@ class LightmapPanel(bpy.types.Panel):
 		    operator="tivoli.lightmap_prepare_materials",
 		).restore = True
 
-		# bake and export
-		final = layout.box()
-		final.label(text="3. Bake and export", icon="RENDER_STILL")
-		final.operator(
-		    icon="RENDER_STILL",
-		    text="Bake scene",
-		    operator="tivoli.lightmap_bake_scene"
+		# bake
+		bake = layout.box()
+		bake.label(text="3. Bake", icon="RENDER_STILL")
+		bake.prop(tivoli_settings, "bake_oidn")
+		bake.operator(text="Bake scene", operator="tivoli.lightmap_bake_scene")
+
+		# export
+		export = layout.box()
+		export.label(text="4. Export", icon="EXPORT")
+		export.operator(
+		    text="Export scene", operator="tivoli.lightmap_export_scene"
 		)
-		final.operator(
-		    icon="EXPORT",
-		    text="Export scene",
-		    operator="tivoli.lightmap_export_scene"
-		)
+
 		progress = tivoli_settings.bake_progress
 		if progress > 0 and progress < 100:
 			bake_progress = layout.box()

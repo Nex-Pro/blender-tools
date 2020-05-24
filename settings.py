@@ -23,6 +23,8 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    default={"1024"}
 	)
 
+	bake_oidn: bpy.props.BoolProperty(name="Denoise with OIDN", default=True)
+
 	bake_current: bpy.props.StringProperty(name="Bake current", default="")
 	bake_progress: bpy.props.FloatProperty(
 	    name="Bake progress",

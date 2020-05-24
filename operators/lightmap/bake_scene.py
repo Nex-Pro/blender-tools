@@ -121,8 +121,9 @@ class LightmapBakeScene(bpy.types.Operator):
 			)
 
 			# denoise
-			image = getLightmapNode(obj.material_slots[0].material).image
-			denoise(image)
+			if scene.tivoli_settings.bake_oidn:
+				image = getLightmapNode(obj.material_slots[0].material).image
+				denoise(image)
 
 			# update current index and text
 			render["current_object_index"] += 1
