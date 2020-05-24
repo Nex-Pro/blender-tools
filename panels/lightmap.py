@@ -55,6 +55,7 @@ class LightmapPanel(bpy.types.Panel):
 		# export
 		export = layout.box()
 		export.label(text="4. Export", icon="EXPORT")
+		export.prop(tivoli_settings, "bake_webp")
 		export.operator(
 		    text="Export scene as GLTF",
 		    operator="tivoli.lightmap_export_scene"

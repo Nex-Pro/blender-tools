@@ -29,7 +29,7 @@ class ThreadedCommand(threading.Thread):
 		self.stdout, self.stderr = process.communicate()
 		print("Finished: " + " ".join(self.command))
 
-def gltf_webp_optimizer(gltf_path):
+def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 	print("WebP optimizing: " + gltf_path)
 	gltf_dir = os.path.dirname(gltf_path)
 
@@ -62,6 +62,9 @@ def gltf_webp_optimizer(gltf_path):
 			commands.append(
 			    [
 			        magick_path, path, "-resize", tivoli_max_texture_size + ">",
+			        "-quality",
+			        str(quality), "-define",
+			        "webp:lossless=" + ("true" if lossless else "false"),
 			        webp_path
 			    ]
 			)

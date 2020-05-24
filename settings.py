@@ -27,6 +27,10 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    name="Denoise with Intel® OIDN", default=True
 	)
 
+	bake_webp: bpy.props.BoolProperty(
+	    name="WebP texture optimize", default=True
+	)
+
 	bake_current: bpy.props.StringProperty(name="Bake current", default="")
 	bake_progress: bpy.props.FloatProperty(
 	    name="Bake progress",

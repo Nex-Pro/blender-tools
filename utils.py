@@ -27,6 +27,24 @@ def findMaterial(name):
 		if name == mat.name:
 			return mat
 
+def findImage(name):
+	for image in bpy.data.images:
+		if name == image.name:
+			return image
+
+def imageExt(image):
+	# https://docs.blender.org/api/current/bpy.types.Image.html?highlight=filepath_raw#bpy.types.f
+	f = image.file_format
+	if f == "JPEG":
+		return "jpg"
+	if f == "JPEG2000":
+		return "jp2"
+	if f == "TARGA":
+		return "tga"
+	if f == "OPEN_EXR_MULTILAYER" or f == "OPEN_EXR":
+		return "exr"
+	return f.lower()
+
 # def generateString(length):
 #     chars = list("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
 #     result = ""
