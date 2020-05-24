@@ -121,8 +121,10 @@ def denoise(image):
 	if not os.path.exists(tmp_dir):
 		os.makedirs(tmp_dir)
 
-	# TODO: use dwaa compression
-	bpy.data.images[image.name
-	               ].filepath_raw = os.path.join(tmp_dir, image.name) + ".exr"
-	bpy.data.images[image.name].file_format = "OPEN_EXR"
-	bpy.data.images[image.name].save()
+	image = bpy.data.images[image.name]
+	# image.filepath_raw = os.path.join(tmp_dir, image.name) + ".exr"
+	# image.file_format = "OPEN_EXR"
+	# HDR has a smaller file size
+	image.filepath_raw = os.path.join(tmp_dir, image.name) + ".hdr"
+	image.file_format = "HDR"
+	image.save()
