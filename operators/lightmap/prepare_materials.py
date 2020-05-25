@@ -35,7 +35,7 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
 		for obj in objects:
-			if obj.visible_get() == False or obj.type != "MESH":
+			if not utils.isObjBakeable(obj):
 				continue
 
 			print(

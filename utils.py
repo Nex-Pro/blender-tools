@@ -4,7 +4,10 @@ from uuid import uuid4
 from mathutils import Vector
 
 def isObjBakeable(obj):
-	return obj.visible_get() == True and obj.type == "MESH"
+	return (
+	    obj.visible_get() and obj.cycles_visibility.camera == True and
+	    obj.type == "MESH"
+	)
 
 def deselectAll():
 	bpy.ops.object.select_all(action="DESELECT")

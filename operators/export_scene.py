@@ -139,7 +139,10 @@ class ExportScene(bpy.types.Operator):
 		instanced_objects = []  # to be cleaned up
 
 		for obj in scene.objects:
-			if obj.visible_get() == False:
+			if (
+			    obj.visible_get() == False or
+			    obj.cycles_visibility.camera == False
+			):
 				continue
 
 			if obj in objects:
