@@ -29,11 +29,29 @@ class LightmapPrepareUVMaps(bpy.types.Operator):
 				uv_layers.remove(uv_layers[UV_NAME])
 
 			# create uv
-			uv_layers.new(name=UV_NAME, do_init=True)
+			uv_layers.new(name=UV_NAME, do_init=False)
+
+			# move uv layer to second slot
+			def move_to_bottom(index):
+				uv_layers.active_index = index
+				uv_name = uv_layers.active.name
+
+				new_uv = uv_layers.new(do_init=True)
+				if new_uv == None:
+					return
+				new_uv_name = new_uv.name
+
+				# delete old uv map
+				uv_layers.remove(uv_layers[index])
+				# rename new map now at the bottom
+				uv_layers[new_uv_name].name = uv_name
+
+			if len(uv_layers) != 2:
+				for i in range(1, len(uv_layers) - 1):
+					move_to_bottom(1)
+
+			# unwrap
 			uv_layers[UV_NAME].active = True
-
-			# TODO: move uv layer to second slot
-
 			utils.selectOnly(obj)
 
 			try:
