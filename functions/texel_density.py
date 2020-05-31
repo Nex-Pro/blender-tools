@@ -21,8 +21,8 @@ def recommended_texture_size(obj):
 		return 0
 	uv_loop = bm.loops.layers.uv["Tivoli_Lightmap"]
 
-	face_area = 0
-	uv_area = 0
+	face_area = 0  # in meters
+	uv_area = 0  # in 1x1 units
 
 	for face in bm.faces:
 		face_area += tri_area(*(v.co for v in face.verts))
