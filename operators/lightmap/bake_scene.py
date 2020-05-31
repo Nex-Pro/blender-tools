@@ -80,28 +80,30 @@ class LightmapBakeScene(bpy.types.Operator):
 
 		obj.active_material_index = 0
 
+		image = self.getLightmapNode(obj.material_slots[0].material).image
+		image.file_format = "HDR"
+		image.filepath_raw = os.path.join(
+		    self.tmp_dir,
+		    image.name,
+		) + "." + utils.imageExt(image)
+
 		# https://docs.blender.org/api/current/bpy.ops.object.html#bpy.ops.object.bake
 		bpy.ops.object.bake(
 		    type="COMBINED",
 		    # pass_filter={"EMIT","DIRECT","INDIRECT"},
-		    uv_layer="Tivoli_Lightmap",
-		    # filepath=os.path.join(basedir, obj.name+".png"),
-		    # width=128,
-		    # height=128,
-		    # margin=2,
+		    filepath=image.filepath_raw,
+		    margin=8192,
 		    # save_mode="EXTERNAL",
-		    margin=8192
+		    save_mode="INTERNAL",
+		    uv_layer="Tivoli_Lightmap",
 		)
-
-		# save image otherwise it all gets allocated in the memory
-		image = self.getLightmapNode(obj.material_slots[0].material).image
 
 		# denoise
 		if scene.tivoli_settings.bake_oidn:
 			denoise(image)
 
-		image.filepath_raw = os.path.join(self.tmp_dir, image.name) + ".hdr"
-		image.file_format = "HDR"
+		# currently saving internally then manually saving externally
+		# https://developer.blender.org/D4162
 		image.save()
 
 		# update current index and text
@@ -168,6 +170,10 @@ class LightmapBakeScene(bpy.types.Operator):
 			os.makedirs(self.tmp_dir)
 
 		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+
+		scene.cycles.device = "GPU"
+		scene.render.tile_x = 8192
+		scene.render.tile_y = 8192
 
 		# TODO: dont bake if materials not prepared
 

@@ -116,7 +116,6 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 				    float_buffer=True,
 				    is_data=True
 				)
-				new_image.file_format = "OPEN_EXR"
 
 				for material_slot in obj.material_slots:
 					material = material_slot.material

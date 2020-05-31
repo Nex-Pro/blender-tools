@@ -42,7 +42,7 @@ def imageExt(image):
 		return "jpg"
 	if f == "JPEG2000":
 		return "jp2"
-	if f == "TARGA":
+	if f == "TARGA" or f == "TARGA_RAW":
 		return "tga"
 	if f == "OPEN_EXR_MULTILAYER" or f == "OPEN_EXR":
 		return "exr"

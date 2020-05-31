@@ -30,10 +30,9 @@ class LightmapExportScene(bpy.types.Operator):
 		# LIGHTMAP_EXT = ".exr"  # for saving
 		# LIGHTMAP_TYPE = "OPEN_EXR"  # for blender
 		# LIGHTMAP_MIMETYPE = "image/exr"  # for gltf
-
-		LIGHTMAP_EXT = ".jpg"  # for saving
-		LIGHTMAP_TYPE = "JPEG"  # for blender
-		LIGHTMAP_MIMETYPE = "image/jpeg"  # for gltf
+		LIGHTMAP_EXT = ".png"  # for saving
+		LIGHTMAP_TYPE = "PNG"  # for blender
+		LIGHTMAP_MIMETYPE = "image/png"  # for gltf
 
 		# export gltf
 		project_name = os.path.splitext(os.path.basename(bpy.data.filepath))[0]
@@ -88,6 +87,9 @@ class LightmapExportScene(bpy.types.Operator):
 
 		# modify gltf
 		def modify_gltf(filepath):
+			if self.webp_textures:
+				gltf_webp_optimizer(filepath)
+
 			file = open(filepath, "r")
 			data = json.load(file)
 			file.close()
@@ -143,7 +145,7 @@ class LightmapExportScene(bpy.types.Operator):
 			file.close()
 
 			if self.webp_textures:
-				gltf_webp_optimizer(filepath, quality=90)
+				gltf_webp_optimizer(filepath, lossless=True)
 
 		if self.as_json:
 			for filename in os.listdir(export_dir):
