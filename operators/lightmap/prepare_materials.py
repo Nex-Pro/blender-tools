@@ -3,6 +3,7 @@ import bmesh
 import math
 
 from ... import utils
+from ...functions.texel_density import recommended_texture_size
 
 class LightmapPrepareMaterials(bpy.types.Operator):
 	bl_idname = "tivoli.lightmap_prepare_materials"
@@ -100,20 +101,7 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 						bpy.data.images.remove(image)
 
 				if scene.tivoli_settings.bake_automatic_texture_size:
-					# mesh = bmesh.new()
-					# mesh.from_mesh(obj.data)
-					# bmesh.ops.transform(
-					#     mesh, matrix=obj.matrix_world, verts=mesh.verts
-					# )
-					# area = sum(f.calc_area() for f in mesh.faces)
-
-					scale = obj.dimensions.x + obj.dimensions.y + obj.dimensions.z
-
-					size = math.floor(scale * 96)
-					if size > 8192:
-						size = 8192
-
-					print(size)
+					size = recommended_texture_size(obj)
 				else:
 					size = int(
 					    list(context.scene.tivoli_settings.bake_texture_size
