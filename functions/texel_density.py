@@ -1,5 +1,6 @@
 import bpy
 import bmesh
+import math
 from mathutils import Vector
 
 # def mesh_area(bm):
@@ -7,6 +8,33 @@ from mathutils import Vector
 
 def tri_area(co1, co2, co3):
 	return (co2 - co1).cross(co3 - co1).length / 2.0
+
+# https://git.tivolicloud.com/tivolicloud/interface/-/blob/master/libraries/image/src/image/TextureProcessing.cpp#L56
+# powers of 2 till SPARSE_PAGE_SIZE then multiples of SPARSE_PAGE_SIZE until 8192
+def rectify_dimension(dimension):
+	SPARSE_PAGE_SIZE = 512
+
+	if dimension == 0:
+		return 0
+	if dimension < SPARSE_PAGE_SIZE:
+		new_size = SPARSE_PAGE_SIZE
+		while (dimension <= new_size / 2):
+			new_size /= 2
+		return new_size
+	else:
+		pages = (
+		    math.floor(dimension / SPARSE_PAGE_SIZE) +
+		    (0 if dimension % SPARSE_PAGE_SIZE == 0 else 1)
+		)
+		new_size = pages * SPARSE_PAGE_SIZE
+		if new_size > 8192:
+			new_size = 8192
+		return new_size
+
+# for i in range(1, 1024, 10):
+# 	print(i, "=>", rectify_dimension(i))
+# for i in range(1, 9000, 100):
+# 	print(i, "=>", rectify_dimension(i))
 
 def recommended_texture_size(obj):
 	bm = bmesh.new()
@@ -28,26 +56,21 @@ def recommended_texture_size(obj):
 		face_area += tri_area(*(v.co for v in face.verts))
 		uv_area += tri_area(*(Vector((*l[uv_loop].uv, 0)) for l in face.loops))
 
+	if uv_area > 1:
+		uv_area = 1
+
 	density = 16
-	res = face_area / uv_area * density
+	res = (face_area / uv_area) * density
 	if res < 128:
 		res = 128
-	if res > 8192:
-		res = 8192
 
-	powers_of_two = [2**i for i in range(0, 14)]  # up to 8192
-
-	for power_res in powers_of_two:
-		if power_res < res:
-			continue
-		res = power_res
-		break
+	res = rectify_dimension(res)
 
 	# print()
 	# print(obj.name)
 	# print("face area:", face_area)
 	# print("uv area:", uv_area)
-	# print("res:", resolution)
+	# print("res:", res)
 
 	# im not sure how correct this is but it seems to be okay
 
