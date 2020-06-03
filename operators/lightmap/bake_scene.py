@@ -162,6 +162,9 @@ class LightmapBakeScene(bpy.types.Operator):
 			link["links"].new(link["from"], link["to"])
 
 	def execute(self, context):
+		if not bpy.data.is_saved:
+			raise Exception("Save first before exporting")
+
 		scene = context.scene
 		objects = scene.objects
 
