@@ -59,8 +59,8 @@ def recommended_texture_size(obj):
 	if uv_area > 1:
 		uv_area = 1
 
-	density = 16
-	res = (face_area / uv_area) * density
+	density = 128
+	res = math.sqrt(face_area / uv_area) * density
 	if res < 128:
 		res = 128
 
@@ -71,7 +71,5 @@ def recommended_texture_size(obj):
 	# print("face area:", face_area)
 	# print("uv area:", uv_area)
 	# print("res:", res)
-
-	# im not sure how correct this is but it seems to be okay
 
 	return res
