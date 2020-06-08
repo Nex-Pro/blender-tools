@@ -68,10 +68,12 @@ def download_imagemagic():
 		#     stdout=subprocess.PIPE,
 		#     stderr=subprocess.PIPE
 		# )
+		print("Download ImageMagick with your system's package manager")
 	elif os.name == "nt":
 		magick_archive_path = download(
-			# TODO: when a new version is released, this link wont work anymore
-		    magick_url + "ImageMagick-7.0.10-16-portable-Q16-x64.zip", libs_dir
+		    # TODO: when a new version is released, this link wont work anymore
+		    magick_url + "ImageMagick-7.0.10-17-portable-Q16-x64.zip",
+		    libs_dir
 		)
 		magick_extract_dir = os.path.join(libs_dir, "magick")
 		unzip(magick_archive_path, magick_extract_dir)
