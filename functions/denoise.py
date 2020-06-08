@@ -6,10 +6,10 @@ import tempfile
 import re
 import bpy
 
-# https://github.com/Naxela/The_Lightmapper/blob/d3451a3f6739cfba9d069d559c4bc2e3bcf39969/Addon/Utility/utility.py
+# https://github.com/Naxela/The_Lightmapper/blob/master/Addon/Utility/utility.py
 
-def loadPfm(file, as_flat_list=False):
-	#start = time()
+def load_pfm(file, as_flat_list=False):
+	# start = time()
 
 	header = file.readline().decode("utf-8").rstrip()
 	if header == "PF":
@@ -41,7 +41,7 @@ def loadPfm(file, as_flat_list=False):
 	#print("PFM import took %.3f s" % (time() - start))
 	return result, scale
 
-def savePfm(file, image, scale=1):
+def save_pfm(file, image, scale=1):
 	# start = time()
 
 	if image.dtype.name != "float32":
@@ -74,7 +74,7 @@ def savePfm(file, image, scale=1):
 
 	# print("PFM export took %.3f s" % (time() - start))
 
-# https://github.com/Naxela/The_Lightmapper/blob/d3451a3f6739cfba9d069d559c4bc2e3bcf39969/Addon/Utility/denoise.py
+# https://github.com/Naxela/The_Lightmapper/blob/master/Addon/Utility/denoise.py
 
 def denoise(image):
 	print("Denoising: " + image.name + "...")
@@ -86,11 +86,10 @@ def denoise(image):
 	original_array = original_array.reshape(height, width, 4)
 	original_array = numpy.float32(original_array[:, :, :3])
 
-	original_dest = tempfile.mkstemp(suffix=".pfm")[1]
-	denoised_dest = tempfile.mkstemp(suffix=".pfm")[1]
+	original_file = tempfile.NamedTemporaryFile(suffix=".pfm", delete=True)
+	denoised_file = tempfile.NamedTemporaryFile(suffix=".pfm", delete=True)
 
-	with open(original_dest, "wb") as file:
-		savePfm(file, original_array)
+	save_pfm(original_file, original_array)
 
 	# run oidn
 	oidn_path = os.path.join(
@@ -100,8 +99,8 @@ def denoise(image):
 		oidn_path += ".exe"
 
 	oidn_args = [
-	    oidn_path + " -f RTLightmap --hdr " + original_dest + " -o " +
-	    denoised_dest
+	    oidn_path + " -f RTLightmap --hdr " + original_file.name + " -o " +
+	    denoised_file.name
 	]
 	oidn = subprocess.Popen(
 	    oidn_args, stdout=subprocess.PIPE, stderr=None, shell=True
@@ -109,10 +108,12 @@ def denoise(image):
 	oidn.communicate()[0]
 
 	# read and save denoised pfm
-	with open(denoised_dest, "rb") as file:
-		denoised_data, scale = loadPfm(file)
+	denoised_data, scale = load_pfm(denoised_file)
 
 	ndata = numpy.array(denoised_data)
 	ndata2 = numpy.dstack((ndata, numpy.ones((width, height))))
 	denoised_array = ndata2.ravel()
 	bpy.data.images[image.name].pixels = denoised_array
+
+	original_file.close()
+	denoised_file.close()
