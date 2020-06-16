@@ -194,6 +194,17 @@ class ExportScene(bpy.types.Operator):
 		for obj in objects:
 			mesh = obj.data
 
+			# tivoli doesn't render loose vertices so remove them
+			# note, this happens on the object in the scene which is destructive
+			utils.selectOnly(obj)
+			bpy.ops.object.mode_set(mode="EDIT")
+			bpy.ops.mesh.select_all(action="SELECT")
+			bpy.ops.mesh.delete_loose(
+			    use_verts=True, use_edges=False, use_faces=False
+			)
+			bpy.ops.mesh.select_all(action="DESELECT")
+			bpy.ops.object.mode_set(mode="OBJECT")
+
 			# export mesh to gltf
 			mesh_filename = mesh.name + ".gltf"
 			# mesh_export_dir = os.path.join(project_export_dir, mesh.name)
@@ -207,7 +218,15 @@ class ExportScene(bpy.types.Operator):
 
 				export_object = bpy.data.objects.new(utils.tivoliUuid(), mesh)
 				context.collection.objects.link(export_object)
+
 				utils.selectOnly(export_object)
+
+				# remove doubles from mesh
+				bpy.ops.object.mode_set(mode="EDIT")
+				bpy.ops.mesh.select_all(action="SELECT")
+				bpy.ops.mesh.remove_doubles(threshold=0.0001)
+				bpy.ops.mesh.select_all(action="DESELECT")
+				bpy.ops.object.mode_set(mode="OBJECT")
 
 				bpy.ops.export_scene.gltf(
 				    filepath=mesh_filepath,
