@@ -84,7 +84,10 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 		thread.join()
 
 	for path in old_images:
-		os.remove(path)
+		try:
+			os.remove(path)
+		except FileNotFoundError:
+			pass
 
 	if len(old_images) > 0:
 		file = open(gltf_path, "w")
