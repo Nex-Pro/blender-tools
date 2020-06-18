@@ -9,17 +9,29 @@ def isObjBakeable(obj):
 	    obj.type == "MESH"
 	)
 
-def deselectAll():
-	bpy.ops.object.select_all(action="DESELECT")
-
-def deselectAllOutliner(context):
+def getContextWithArea(areaType, context=bpy.context):
+	# https://docs.blender.org/api/current/bpy.types.Area.html#bpy.types.Area.type
 	for window in bpy.context.window_manager.windows:
 		screen = window.screen
 		for area in screen.areas:
-			if area.type == "OUTLINER":
-				override = {"window": window, "screen": screen, "area": area}
-				bpy.ops.outliner.select_all(override, action="DESELECT")
-				break
+			if area.type == areaType:
+				return {"window": window, "screen": screen, "area": area}
+	return None
+
+def selectAll(context=bpy.context):
+	bpy.ops.object.select_all(
+	    getContextWithArea("VIEW_3D", context), action="SELECT"
+	)
+
+def deselectAll(context=bpy.context):
+	bpy.ops.object.select_all(
+	    getContextWithArea("VIEW_3D", context), action="DESELECT"
+	)
+
+def deselectAllOutliner(context=bpy.context):
+	bpy.ops.outliner.select_all(
+	    getContextWithArea("OUTLINER", context), action="DESELECT"
+	)
 
 def selectOnly(obj):
 	deselectAll()

@@ -109,7 +109,7 @@ class ExportScene(bpy.types.Operator):
 		if not bpy.data.is_saved:
 			raise Exception("Save first before exporting")
 
-		utils.deselectAll()
+		utils.deselectAll(context)
 		utils.deselectAllOutliner(context)
 
 		scene = context.scene
