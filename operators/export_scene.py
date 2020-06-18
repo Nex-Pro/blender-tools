@@ -134,6 +134,22 @@ class ExportScene(bpy.types.Operator):
 		if not base_url.endswith("/"):
 			base_url += "/"
 
+		# make sure all objects are valid
+		for obj in scene.objects:
+			if (
+			    obj.visible_get() == False or
+			    obj.cycles_visibility.camera == False
+			):
+				continue
+
+			scale = obj.matrix_world.to_scale()
+			if scale.x < 0 or scale.y < 0 or scale.z < 0:
+				utils.selectOnly(obj)
+				raise Exception(
+				    obj.name +
+				    " has a negative scale which is not supported in Tivoli"
+				)
+
 		# collect all objects including instanced collections
 		objects = []
 		instanced_objects = []  # to be cleaned up
