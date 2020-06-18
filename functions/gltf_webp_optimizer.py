@@ -4,13 +4,6 @@ import subprocess
 import threading
 from .. import utils
 
-if os.name == "posix":
-	magick_path = utils.which("magick")
-elif os.name == "nt":
-	magick_path = os.path.join(
-	    os.path.dirname(os.path.realpath(__file__)), "../libs/magick"
-	) + ".exe"
-
 tivoli_max_texture_size = "8192x8192"
 
 class ThreadedCommand(threading.Thread):
@@ -62,8 +55,8 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 		if not os.path.exists(webp_path):
 			commands.append(
 			    [
-			        magick_path, path, "-resize", tivoli_max_texture_size + ">",
-			        "-quality",
+			        utils.getMagickPath(), path, "-resize",
+			        tivoli_max_texture_size + ">", "-quality",
 			        str(quality), "-define",
 			        "webp:lossless=" + ("true" if lossless else "false"),
 			        webp_path

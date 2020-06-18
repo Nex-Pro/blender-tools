@@ -1,5 +1,6 @@
 import bpy
 import subprocess
+import os
 from uuid import uuid4
 from mathutils import Vector
 
@@ -116,3 +117,16 @@ def rotateAroundPivot(position, rotation, pivot=Vector((0, 0, 0))):
 
 def which(program):
 	return subprocess.check_output(["which", program]).decode("utf-8").strip()
+
+def getOidnPath():
+	return os.path.join(
+	    os.path.dirname(os.path.realpath(__file__)), "libs/oidn/bin/denoise"
+	) + (".exe" if os.name == "nt" else "")
+
+def getMagickPath():
+	if os.name == "posix":
+		return which("magick")
+	elif os.name == "nt":
+		return os.path.join(
+		    os.path.dirname(os.path.realpath(__file__)), "libs/magick.exe"
+		)

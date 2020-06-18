@@ -5,6 +5,7 @@ import numpy
 import tempfile
 import re
 import bpy
+from .. import utils
 
 # https://github.com/Naxela/The_Lightmapper/blob/master/Addon/Utility/utility.py
 
@@ -92,15 +93,9 @@ def denoise(image):
 	save_pfm(original_file, original_array)
 
 	# run oidn
-	oidn_path = os.path.join(
-	    os.path.dirname(os.path.realpath(__file__)), "../libs/oidn/bin/denoise"
-	)
-	if os.name == "nt":
-		oidn_path += ".exe"
-
 	oidn_args = [
-	    oidn_path + " -f RTLightmap --hdr " + original_file.name + " -o " +
-	    denoised_file.name
+	    utils.getOidnPath() + " -f RTLightmap --hdr " + original_file.name +
+	    " -o " + denoised_file.name
 	]
 	oidn = subprocess.Popen(
 	    oidn_args, stdout=subprocess.PIPE, stderr=None, shell=True
