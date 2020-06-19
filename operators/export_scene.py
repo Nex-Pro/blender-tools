@@ -247,7 +247,7 @@ class ExportScene(bpy.types.Operator):
 				bpy.ops.export_scene.gltf(
 				    filepath=mesh_filepath,
 				    export_format="GLTF_SEPARATE",
-				    export_selected=True,
+				    use_selection=True,
 				    export_apply=True,
 				    # TODO: duplicate image names will overwrite each other
 				    export_texture_dir=textures_dir

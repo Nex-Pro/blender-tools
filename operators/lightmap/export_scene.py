@@ -57,7 +57,7 @@ class LightmapExportScene(bpy.types.Operator):
 			    export_format="GLTF_SEPARATE",
 			    export_copyright="Tivoli Cloud VR, Inc.",
 			    # export_image_format="JPEG",
-			    export_selected=True,
+			    use_selection=True,
 			    export_apply=True,
 			    filepath=filepath,
 			)
