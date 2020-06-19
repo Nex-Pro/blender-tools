@@ -14,17 +14,17 @@ class LightmapBakeScene(bpy.types.Operator):
 	objects_to_bake = []
 	current_object_index = 0
 
-	def getLightmapNode(self, material):
+	def get_lightmap_node(self, material):
 		for node in material.node_tree.nodes:
 			if node.name.startswith("Tivoli_Lightmap"):
 				return node
 
-	def canBake(self):
+	def can_bake(self):
 		if self.current_object_index > len(self.objects_to_bake) - 1:
 			return False
 		return True
 
-	def updateBakeProgress(self, context):
+	def update_bake_progress(self, context):
 		tivoli_settings = context.scene.tivoli_settings
 
 		progress = self.current_object_index / len(self.objects_to_bake) * 100
@@ -35,13 +35,13 @@ class LightmapBakeScene(bpy.types.Operator):
 		)
 		tivoli_settings.bake_progress = progress
 
-		if self.canBake():
+		if self.can_bake():
 			obj = self.objects_to_bake[self.current_object_index]
 			tivoli_settings.bake_current = obj.name
 
 			for material_slot in obj.material_slots:
 				material = material_slot.material
-				node = self.getLightmapNode(material)
+				node = self.get_lightmap_node(material)
 
 				tivoli_settings.bake_current_texture_size = (
 				    str(node.image.size[0]) + " x " + str(node.image.size[1])
@@ -52,10 +52,10 @@ class LightmapBakeScene(bpy.types.Operator):
 			tivoli_settings.bake_current_texture_size = ""
 			tivoli_settings.bake_progress = -1
 
-	def bakeNextObj(self, context):
+	def bake_next_obj(self, context):
 		scene = context.scene
 
-		if self.canBake() == False:
+		if self.can_bake() == False:
 			return False
 
 		obj = self.objects_to_bake[self.current_object_index]
@@ -63,14 +63,14 @@ class LightmapBakeScene(bpy.types.Operator):
 		print("\nBaking: " + obj.name + "...")
 
 		# select obj
-		utils.deselectAll()
+		utils.deselect_all()
 		obj.select_set(state=True)
 		context.view_layer.objects.active = obj
 
 		# select texture
 		for material_slot in obj.material_slots:
 			material = material_slot.material
-			node = self.getLightmapNode(material)
+			node = self.get_lightmap_node(material)
 
 			for node in material.node_tree.nodes:
 				node.select = False
@@ -80,12 +80,12 @@ class LightmapBakeScene(bpy.types.Operator):
 
 		obj.active_material_index = 0
 
-		image = self.getLightmapNode(obj.material_slots[0].material).image
+		image = self.get_lightmap_node(obj.material_slots[0].material).image
 		image.file_format = "HDR"
 		image.filepath_raw = os.path.join(
 		    self.tmp_dir,
 		    image.name,
-		) + "." + utils.imageExt(image)
+		) + "." + utils.image_ext(image)
 
 		# https://docs.blender.org/api/current/bpy.ops.object.html#bpy.ops.object.bake
 		bpy.ops.object.bake(
@@ -111,7 +111,7 @@ class LightmapBakeScene(bpy.types.Operator):
 
 		return True
 
-	def unlinkDiffuse(self, objects):
+	def unlink_diffuse(self, objects):
 		old = {"colors": [], "links": []}
 
 		for obj in objects:
@@ -151,7 +151,7 @@ class LightmapBakeScene(bpy.types.Operator):
 
 		return old
 
-	def relinkDiffuse(self, old):
+	def relink_diffuse(self, old):
 		for color in old["colors"]:
 			color["color"][0] = color["r"]
 			color["color"][1] = color["g"]
@@ -184,16 +184,16 @@ class LightmapBakeScene(bpy.types.Operator):
 		# TODO: dont bake if materials not prepared
 
 		self.objects_to_bake = [
-		    obj for obj in objects if utils.isObjBakeable(obj)
+		    obj for obj in objects if utils.is_obj_bakeable(obj)
 		]
 		self.current_object_index = 0
 
 		# necessary for diffuse light map
-		self.links = self.unlinkDiffuse(self.objects_to_bake)
+		self.links = self.unlink_diffuse(self.objects_to_bake)
 
 		print("Starting bake...")
 
-		self.updateBakeProgress(context)
+		self.update_bake_progress(context)
 
 		self.timer = context.window_manager.event_timer_add(
 		    0.01, window=context.window
@@ -209,13 +209,13 @@ class LightmapBakeScene(bpy.types.Operator):
 
 	def modal(self, context, event):
 		if event.type == "TIMER":
-			if self.bakeNextObj(context):
-				self.updateBakeProgress(context)
+			if self.bake_next_obj(context):
+				self.update_bake_progress(context)
 				return {"PASS_THROUGH"}
 
-			self.relinkDiffuse(self.links)
+			self.relink_diffuse(self.links)
 
-			utils.deselectAll()
+			utils.deselect_all()
 
 			context.window_manager.event_timer_remove(self.timer)
 			return {"FINISHED"}

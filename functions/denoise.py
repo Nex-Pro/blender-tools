@@ -94,7 +94,7 @@ def denoise(image):
 
 	# run oidn
 	oidn_args = [
-	    utils.getOidnPath() + " -f RTLightmap --hdr " + original_file.name +
+	    utils.get_oidn_path() + " -f RTLightmap --hdr " + original_file.name +
 	    " -o " + denoised_file.name
 	]
 	oidn = subprocess.Popen(

@@ -4,13 +4,13 @@ import os
 from uuid import uuid4
 from mathutils import Vector
 
-def isObjBakeable(obj):
+def is_obj_bakeable(obj):
 	return (
 	    obj.visible_get() and obj.cycles_visibility.camera == True and
 	    obj.type == "MESH"
 	)
 
-def getContextWithArea(areaType, context=bpy.context):
+def get_context_with_area(areaType, context=bpy.context):
 	# https://docs.blender.org/api/current/bpy.types.Area.html#bpy.types.Area.type
 	for window in bpy.context.window_manager.windows:
 		screen = window.screen
@@ -19,36 +19,36 @@ def getContextWithArea(areaType, context=bpy.context):
 				return {"window": window, "screen": screen, "area": area}
 	return None
 
-def selectAll(context=bpy.context):
+def select_all(context=bpy.context):
 	bpy.ops.object.select_all(
-	    getContextWithArea("VIEW_3D", context), action="SELECT"
+	    get_context_with_area("VIEW_3D", context), action="SELECT"
 	)
 
-def deselectAll(context=bpy.context):
+def deselect_all(context=bpy.context):
 	bpy.ops.object.select_all(
-	    getContextWithArea("VIEW_3D", context), action="DESELECT"
+	    get_context_with_area("VIEW_3D", context), action="DESELECT"
 	)
 
-def deselectAllOutliner(context=bpy.context):
+def deselect_all_outliner(context=bpy.context):
 	bpy.ops.outliner.select_all(
-	    getContextWithArea("OUTLINER", context), action="DESELECT"
+	    get_context_with_area("OUTLINER", context), action="DESELECT"
 	)
 
-def selectOnly(obj):
-	deselectAll()
+def select_only(obj):
+	deselect_all()
 	obj.select_set(state=True)
 
-def findMaterial(name):
+def find_material(name):
 	for mat in bpy.data.materials:
 		if name == mat.name:
 			return mat
 
-def findImage(name):
+def find_image(name):
 	for image in bpy.data.images:
 		if name == image.name:
 			return image
 
-def imageExt(image):
+def image_ext(image):
 	# https://docs.blender.org/api/current/bpy.types.Image.html?highlight=filepath_raw#bpy.types.f
 	f = image.file_format
 	if f == "JPEG":
@@ -70,26 +70,26 @@ def imageExt(image):
 
 #     return result
 
-def findMaterialOrCloneWithName(name, clone_material):
-	material = findMaterial(name)
+def find_material_or_clone_with_name(name, clone_material):
+	material = find_material(name)
 	if material == None:
 		material = clone_material.copy()
 		material.name = name
 	return material
 
-def findOrCreateDefaultMaterial():
-	material = findMaterial("Material")
+def find_or_create_default_material():
+	material = find_material("Material")
 	if material == None:
 		material = bpy.data.materials.new(name="Material")
 		material.use_nodes = True  # makes principled
 	return material
 
-def findObject(name):
+def find_object(name):
 	for obj in bpy.context.scene.objects:
 		if obj.name == name:
 			return obj
 
-def findObjectFromMaterialName(name):
+def find_object_from_material_name(name):
 	for obj in bpy.context.scene.objects:
 		for material_slot in obj.material_slots:
 			if (
@@ -98,19 +98,19 @@ def findObjectFromMaterialName(name):
 			):
 				return obj
 
-def tivoliUuid():
+def tivoli_uuid():
 	return "{" + str(uuid4()) + "}"
 
-def vecMultiply(a, b):
+def vec_multiply(a, b):
 	return Vector((a[0] * b[0], a[1] * b[1], a[2] * b[2]))
 
-def vecDivide(a, b):
+def vec_divide(a, b):
 	try:
 		return Vector((a[0] / b[0], a[1] / b[1], a[2] / b[2]))
 	except ZeroDivisionError:
 		return Vector((0, 0, 0))
 
-def rotateAroundPivot(position, rotation, pivot=Vector((0, 0, 0))):
+def rotate_around_pivot(position, rotation, pivot=Vector((0, 0, 0))):
 	vec = position - pivot
 	vec.rotate(rotation)
 	return vec
@@ -118,12 +118,12 @@ def rotateAroundPivot(position, rotation, pivot=Vector((0, 0, 0))):
 def which(program):
 	return subprocess.check_output(["which", program]).decode("utf-8").strip()
 
-def getOidnPath():
+def get_oidn_path():
 	return os.path.join(
 	    os.path.dirname(os.path.realpath(__file__)), "libs/oidn/bin/denoise"
 	) + (".exe" if os.name == "nt" else "")
 
-def getMagickPath():
+def get_magick_path():
 	if os.name == "posix":
 		return which("magick")
 	elif os.name == "nt":

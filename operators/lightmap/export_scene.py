@@ -74,7 +74,7 @@ class LightmapExportScene(bpy.types.Operator):
 
 			if self.webp_textures:
 				# dont convert image
-				image.filepath_raw = export_path + "." + utils.imageExt(image)
+				image.filepath_raw = export_path + "." + utils.image_ext(image)
 				image.save()
 			else:
 				image.filepath_raw = export_path + LIGHTMAP_EXT
@@ -94,7 +94,7 @@ class LightmapExportScene(bpy.types.Operator):
 			data = json.load(file)
 			file.close()
 
-			def addTexture(image):
+			def add_texture(image):
 				if "images" not in data:
 					data["images"] = []
 				if "textures" not in data:
@@ -105,7 +105,7 @@ class LightmapExportScene(bpy.types.Operator):
 					    {
 					        "mimeType": "",  # will be written by optimizer
 					        "name": image.name,
-					        "uri": image.name + "." + utils.imageExt(image),
+					        "uri": image.name + "." + utils.image_ext(image),
 					    }
 					)
 				else:
@@ -125,11 +125,11 @@ class LightmapExportScene(bpy.types.Operator):
 				return index
 
 			for material in data["materials"]:
-				obj = utils.findObjectFromMaterialName(material["name"])
+				obj = utils.find_object_from_material_name(material["name"])
 
 				image_name = "Tivoli_Lightmap_" + obj.name
-				image = utils.findImage(image_name)
-				texture_index = addTexture(image)
+				image = utils.find_image(image_name)
+				texture_index = add_texture(image)
 
 				print(image_name)
 				print(texture_index)
@@ -156,6 +156,6 @@ class LightmapExportScene(bpy.types.Operator):
 		else:
 			modify_gltf(filepath)
 
-		utils.deselectAll()
+		utils.deselect_all()
 
 		return {"FINISHED"}

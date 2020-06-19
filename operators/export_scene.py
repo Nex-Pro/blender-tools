@@ -46,13 +46,13 @@ def tivoli_registration_point(obj):
 	dimensions = bounding_box_max - bounding_box_min
 
 	# -1 to 1
-	normalized_origin = utils.vecDivide(
-	    origin, utils.vecDivide(dimensions, Vector((2, 2, 2)))
+	normalized_origin = utils.vec_divide(
+	    origin, utils.vec_divide(dimensions, Vector((2, 2, 2)))
 	)
 	# 0 to 1
 	registration_point = (
 	    (
-	        utils.vecMultiply(normalized_origin, Vector((-1, -1, 1))) +
+	        utils.vec_multiply(normalized_origin, Vector((-1, -1, 1))) +
 	        Vector((1, 1, 1))
 	    ) / 2
 	)
@@ -79,7 +79,7 @@ def tivoli_quat(quat):
 
 def tivoli_empty(name, position=Vector(), rotation=Quaternion()):
 	return {
-	    "id": utils.tivoliUuid(),
+	    "id": utils.tivoli_uuid(),
 	    "type": "Box",
 	    "visible": False,
 	    "name": name,
@@ -109,8 +109,8 @@ class ExportScene(bpy.types.Operator):
 		if not bpy.data.is_saved:
 			raise Exception("Save first before exporting")
 
-		utils.deselectAll(context)
-		utils.deselectAllOutliner(context)
+		utils.deselect_all(context)
+		utils.deselect_all_outliner(context)
 
 		scene = context.scene
 
@@ -144,7 +144,7 @@ class ExportScene(bpy.types.Operator):
 
 			scale = obj.matrix_world.to_scale()
 			if scale.x < 0 or scale.y < 0 or scale.z < 0:
-				utils.selectOnly(obj)
+				utils.select_only(obj)
 				raise Exception(
 				    obj.name +
 				    " has a negative scale which is not supported in Tivoli"
@@ -182,11 +182,11 @@ class ExportScene(bpy.types.Operator):
 					)
 					context.collection.objects.link(instanced_object)
 
-					instanced_object.location = utils.vecMultiply(
-					    utils.rotateAroundPivot(obj.location, rotation_euler),
+					instanced_object.location = utils.vec_multiply(
+					    utils.rotate_around_pivot(obj.location, rotation_euler),
 					    scale
 					) + location
-					instanced_object.scale = utils.vecMultiply(
+					instanced_object.scale = utils.vec_multiply(
 					    scale,
 					    obj.scale,
 					)
@@ -202,7 +202,7 @@ class ExportScene(bpy.types.Operator):
 		# iterate and write to export
 		meshes = []
 
-		export = {"Id": utils.tivoliUuid(), "Version": 129, "Entities": []}
+		export = {"Id": utils.tivoli_uuid(), "Version": 129, "Entities": []}
 
 		root_entity = tivoli_empty(project_name)
 		export["Entities"].append(root_entity)
@@ -212,7 +212,7 @@ class ExportScene(bpy.types.Operator):
 
 			# tivoli doesn't render loose vertices so remove them
 			# note, this happens on the object in the scene which is destructive
-			utils.selectOnly(obj)
+			utils.select_only(obj)
 			bpy.ops.object.mode_set(mode="EDIT")
 			bpy.ops.mesh.select_all(action="SELECT")
 			bpy.ops.mesh.delete_loose(
@@ -232,10 +232,10 @@ class ExportScene(bpy.types.Operator):
 
 				# os.makedirs(mesh_export_dir)
 
-				export_object = bpy.data.objects.new(utils.tivoliUuid(), mesh)
+				export_object = bpy.data.objects.new(utils.tivoli_uuid(), mesh)
 				context.collection.objects.link(export_object)
 
-				utils.selectOnly(export_object)
+				utils.select_only(export_object)
 
 				# remove doubles from mesh
 				bpy.ops.object.mode_set(mode="EDIT")
@@ -273,7 +273,7 @@ class ExportScene(bpy.types.Operator):
 
 			export["Entities"].append(
 			    {
-			        "id": utils.tivoliUuid(),
+			        "id": utils.tivoli_uuid(),
 			        "type": "Model",
 			        "parentID": root_entity["id"],
 			        "name": obj.name,
@@ -289,10 +289,10 @@ class ExportScene(bpy.types.Operator):
 			)
 
 		for obj in instanced_objects:
-			utils.selectOnly(obj)
+			utils.select_only(obj)
 			bpy.ops.object.delete()
 
-		utils.deselectAll()
+		utils.deselect_all()
 
 		# write to json
 		filepath = os.path.join(project_export_dir, project_name) + ".json"

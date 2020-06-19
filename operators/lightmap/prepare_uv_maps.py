@@ -16,7 +16,7 @@ class LightmapPrepareUVMaps(bpy.types.Operator):
 		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
 		for obj in objects:
-			if not utils.isObjBakeable(obj):
+			if not utils.is_obj_bakeable(obj):
 				continue
 
 			print("Preparing UV map for: " + obj.name)
@@ -52,7 +52,7 @@ class LightmapPrepareUVMaps(bpy.types.Operator):
 
 			# unwrap
 			uv_layers[UV_NAME].active = True
-			utils.selectOnly(obj)
+			utils.select_only(obj)
 
 			try:
 				# bpy.ops.uv.lightmap_pack(PREF_CONTEXT="ALL_FACES")
@@ -65,6 +65,6 @@ class LightmapPrepareUVMaps(bpy.types.Operator):
 			if pre_active_index != -1:
 				uv_layers.active_index = pre_active_index
 
-		utils.deselectAll()
+		utils.deselect_all()
 
 		return {"FINISHED"}

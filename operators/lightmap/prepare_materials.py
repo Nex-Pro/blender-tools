@@ -23,10 +23,10 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 
 		# RANDOM_STRING_LENGTH = 8
 
-		def serializeName(obj, material):
+		def serialize_name(obj, material):
 			return MATERIAL_PREFIX + "_" + obj.name + "_" + material.name
 
-		def deserializeName(obj, material):
+		def deserialize_name(obj, material):
 			return material.name[len(MATERIAL_PREFIX + "_" + obj.name +
 			                         "_"):99999]
 
@@ -36,7 +36,7 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
 		for obj in objects:
-			if not utils.isObjBakeable(obj):
+			if not utils.is_obj_bakeable(obj):
 				continue
 
 			print(
@@ -55,25 +55,25 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 					if self.restore:
 						continue
 					else:
-						material = utils.findOrCreateDefaultMaterial()
+						material = utils.find_or_create_default_material()
 
 				#  undo tivoli material
 				if material.name.startswith(MATERIAL_PREFIX):
-					old_material_name = deserializeName(obj, material)
-					old_material = utils.findMaterial(old_material_name)
+					old_material_name = deserialize_name(obj, material)
+					old_material = utils.find_material(old_material_name)
 
 					if old_material != None:
 						material = old_material
 					else:
 						# cant find old material so use default
-						material = utils.findOrCreateDefaultMaterial()
+						material = utils.find_or_create_default_material()
 
 				if self.restore:
 					obj.material_slots[index].material = material
 				else:
 					# find or clone new material and replace
-					new_material_name = serializeName(obj, material)
-					new_material = utils.findMaterialOrCloneWithName(
+					new_material_name = serialize_name(obj, material)
+					new_material = utils.find_material_or_clone_with_name(
 					    new_material_name, material
 					)
 
@@ -82,10 +82,10 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 
 			# if no material slots, use default material
 			if not self.restore and len(material_slots) == 0:
-				material = utils.findOrCreateDefaultMaterial()
+				material = utils.find_or_create_default_material()
 
-				new_material_name = serializeName(obj, material)
-				new_material = utils.findMaterialOrCloneWithName(
+				new_material_name = serialize_name(obj, material)
+				new_material = utils.find_material_or_clone_with_name(
 				    new_material_name, material
 				)
 
@@ -141,7 +141,7 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 					#     bsdf.inputs["Emission"]
 					# )
 
-		utils.deselectAll()
+		utils.deselect_all()
 
 		# remove all unused lightmap materials and textures
 		for material in bpy.data.materials:

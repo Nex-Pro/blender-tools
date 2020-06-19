@@ -55,7 +55,7 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 		if not os.path.exists(webp_path):
 			commands.append(
 			    [
-			        utils.getMagickPath(), path, "-resize",
+			        utils.get_magick_path(), path, "-resize",
 			        tivoli_max_texture_size + ">", "-quality",
 			        str(quality), "-define",
 			        "webp:lossless=" + ("true" if lossless else "false"),
