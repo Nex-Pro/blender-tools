@@ -169,35 +169,18 @@ class ExportScene(bpy.types.Operator):
 				continue
 
 			if obj.type == "EMPTY" and obj.instance_type == "COLLECTION":
-				collection = obj.instance_collection
-				name = obj.name
+				utils.select_only(obj)
 
-				location = obj.location
-				scale = obj.scale
-				rotation_euler = obj.rotation_euler
+				bpy.ops.object.duplicate()  # changes selection
+				for obj in context.selected_objects:
+					instanced_objects.append(obj)  # cleanup
 
-				for obj in collection.all_objects:
-					instanced_object = bpy.data.objects.new(
-					    name + ": " + obj.name, obj.data
-					)
-					context.collection.objects.link(instanced_object)
+				bpy.ops.object.duplicates_make_real()  # changes selection
+				for obj in context.selected_objects:
+					instanced_objects.append(obj)  # cleanup
 
-					instanced_object.location = utils.vec_multiply(
-					    utils.rotate_around_pivot(obj.location, rotation_euler),
-					    scale
-					) + location
-					instanced_object.scale = utils.vec_multiply(
-					    scale,
-					    obj.scale,
-					)
-					instanced_object.rotation_euler = (
-					    rotation_euler[0] + obj.rotation_euler[0],
-					    rotation_euler[1] + obj.rotation_euler[1],
-					    rotation_euler[2] + obj.rotation_euler[2],
-					)
-
-					objects.append(instanced_object)
-					instanced_objects.append(instanced_object)
+					if obj.type == "MESH":
+						objects.append(obj)
 
 		# iterate and write to export
 		meshes = []
