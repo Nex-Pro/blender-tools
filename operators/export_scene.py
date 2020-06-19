@@ -208,6 +208,10 @@ class ExportScene(bpy.types.Operator):
 		export["Entities"].append(root_entity)
 
 		for obj in objects:
+			# child parented to a child?
+			if obj.type != "MESH":
+				continue
+
 			mesh = obj.data
 
 			# tivoli doesn't render loose vertices so remove them
@@ -247,7 +251,7 @@ class ExportScene(bpy.types.Operator):
 				bpy.ops.export_scene.gltf(
 				    filepath=mesh_filepath,
 				    export_format="GLTF_SEPARATE",
-				    use_selection=True,
+				    export_selected=True,
 				    export_apply=True,
 				    # TODO: duplicate image names will overwrite each other
 				    export_texture_dir=textures_dir
