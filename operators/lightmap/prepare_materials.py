@@ -51,6 +51,9 @@ class LightmapPrepareMaterials(bpy.types.Operator):
 				material_slot = material_slots[index]
 				material = material_slot.material
 
+				# use fake user so nothing gets deleted when saving
+				material.use_fake_user = True
+
 				if material == None:
 					if self.restore:
 						continue
