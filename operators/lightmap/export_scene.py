@@ -124,6 +124,9 @@ class LightmapExportScene(bpy.types.Operator):
 
 				return index
 
+			if "materials" not in data:
+				return
+
 			for material in data["materials"]:
 				obj = utils.find_object_from_material_name(material["name"])
 
