@@ -120,7 +120,16 @@ class LightmapBakeScene(bpy.types.Operator):
 				nodes = material.node_tree.nodes
 				links = material.node_tree.links
 
-				bsdf = nodes["Principled BSDF"]
+				bsdf = None
+				for node in nodes:
+					if node.type == "BSDF_PRINCIPLED":
+						bsdf = node
+						break
+				if bsdf == None:
+					raise Exception(
+					    "Can't find Principled BSDF in " + material.name
+					)
+
 				base_color = bsdf.inputs["Base Color"]
 
 				# save color and set to white
