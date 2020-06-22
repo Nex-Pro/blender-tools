@@ -87,15 +87,21 @@ def denoise(image):
 	original_array = original_array.reshape(height, width, 4)
 	original_array = numpy.float32(original_array[:, :, :3])
 
-	original_file = tempfile.NamedTemporaryFile(suffix=".pfm", delete=True)
-	denoised_file = tempfile.NamedTemporaryFile(suffix=".pfm", delete=True)
+	original_file = tempfile.mktemp(suffix=".pfm")
+	denoised_file = tempfile.mktemp(suffix=".pfm")
 
-	save_pfm(original_file, original_array)
+	with open(original_file, "wb") as file:
+		save_pfm(file, original_array)
 
 	# run oidn
 	oidn_args = [
-	    utils.get_oidn_path() + " -f RTLightmap --hdr " + original_file.name +
-	    " -o " + denoised_file.name
+	    utils.get_oidn_path(),
+	    "-f",
+	    "RTLightmap",
+	    "--hdr",
+	    original_file,
+	    "-o",
+	    denoised_file,
 	]
 	oidn = subprocess.Popen(
 	    oidn_args, stdout=subprocess.PIPE, stderr=None, shell=True
@@ -103,12 +109,13 @@ def denoise(image):
 	oidn.communicate()[0]
 
 	# read and save denoised pfm
-	denoised_data, scale = load_pfm(denoised_file)
+	with open(denoised_file, "rb") as file:
+		denoised_data, scale = load_pfm(file)
 
 	ndata = numpy.array(denoised_data)
 	ndata2 = numpy.dstack((ndata, numpy.ones((width, height))))
 	denoised_array = ndata2.ravel()
 	bpy.data.images[image.name].pixels = denoised_array
 
-	original_file.close()
-	denoised_file.close()
+	os.remove(original_file)
+	os.remove(denoised_file)
