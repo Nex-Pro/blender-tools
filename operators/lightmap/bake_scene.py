@@ -175,7 +175,6 @@ class LightmapBakeScene(bpy.types.Operator):
 			raise Exception("Save first before exporting")
 
 		scene = context.scene
-		objects = scene.objects
 
 		scene.render.engine = "CYCLES"
 		scene.render.tile_x = 8192
@@ -192,10 +191,12 @@ class LightmapBakeScene(bpy.types.Operator):
 
 		# TODO: dont bake if materials not prepared
 
-		self.objects_to_bake = [
-		    obj for obj in objects if utils.is_obj_bakeable(obj)
-		]
+		self.objects_to_bake = []
 		self.current_object_index = 0
+
+		for obj in scene.objects:
+			if utils.is_obj_bakeable(obj):
+				self.objects_to_bake.append(obj)
 
 		# necessary for diffuse light map
 		self.links = self.unlink_diffuse(self.objects_to_bake)
