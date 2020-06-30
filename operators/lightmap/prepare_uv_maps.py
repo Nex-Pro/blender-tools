@@ -56,8 +56,11 @@ class LightmapPrepareUVMaps(bpy.types.Operator):
 
 			try:
 				# bpy.ops.uv.lightmap_pack(PREF_CONTEXT="ALL_FACES")
-				# bpy.ops.uv.smart_project(angle_limit=33, island_margin=0.03)
-				bpy.ops.uv.smart_project()
+				bpy.ops.uv.smart_project(
+				    angle_limit=45,
+				    island_margin=0.1,
+				    user_area_weight=1.0,
+				)
 			except:
 				print("Can't generate UV map for:" + obj.name)
 
