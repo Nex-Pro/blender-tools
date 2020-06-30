@@ -103,9 +103,7 @@ def denoise(image):
 	    "-o",
 	    denoised_file,
 	]
-	oidn = subprocess.Popen(
-	    oidn_args, stdout=subprocess.PIPE, stderr=None, shell=True
-	)
+	oidn = subprocess.Popen(oidn_args, stdout=None, stderr=None, shell=False)
 	oidn.communicate()[0]
 
 	# read and save denoised pfm
