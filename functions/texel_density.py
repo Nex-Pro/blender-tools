@@ -56,6 +56,9 @@ def recommended_texture_size(obj):
 		face_area += tri_area(*(v.co for v in face.verts))
 		uv_area += tri_area(*(Vector((*l[uv_loop].uv, 0)) for l in face.loops))
 
+	if uv_area == 0:
+		raise Exception(obj.name + " has 0 uv area. No faces?")
+
 	if uv_area > 1:
 		uv_area = 1
 
