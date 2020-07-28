@@ -21,7 +21,7 @@ build:
         - sed -i "s/(0, 0, 0)/($VERSION_CSV)/" __init__.py
 
         - mkdir $NAME
-        - ls -a | grep -v $NAME | xargs mv -t $NAME
+        - ls | grep -v $NAME | xargs mv -t $NAME
 
         # TODO move download libs to addon itself so artifacts are tiny
 
