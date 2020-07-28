@@ -8,6 +8,8 @@ class TivoliSettings(bpy.types.PropertyGroup):
 
 	# ---
 
+	bake_enabled: bpy.props.BoolProperty(default=False)
+
 	bake_automatic_texture_size: bpy.props.BoolProperty(
 	    name="Auto texture size", default=True
 	)
