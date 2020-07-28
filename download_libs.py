@@ -1,10 +1,15 @@
 import os
+import sys
 import shutil
 import tarfile
 import urllib.request
 import subprocess
 import tempfile
+import xml.etree.ElementTree as ElementTree
 from zipfile import ZipFile
+
+if len(sys.argv) > 1:
+	os.name = sys.argv[1]
 
 def github_release(project, version, filename):
 	return "https://github.com/" + project + "/releases/download/" + version + "/" + filename
@@ -70,11 +75,28 @@ def download_imagemagic():
 		# )
 		print("Download ImageMagick with your system's package manager")
 	elif os.name == "nt":
-		magick_archive_path = download(
-		    # TODO: when a new version is released, this link wont work anymore
-		    magick_url + "ImageMagick-7.0.10-17-portable-Q16-x64.zip",
-		    libs_dir
+
+		# get latest release url
+		digest_res = urllib.request.urlopen(magick_url + "digest.rdf")
+		digest_xml = ""
+		for line in digest_res:
+			digest_xml += line.decode("utf-8")
+		digest = ElementTree.fromstring(digest_xml)
+		releases = list(
+		    filter(
+		        lambda filename: filename.endswith("portable-Q16-x64.zip"),
+		        map(
+		            lambda content: content.
+		            get("{http://www.w3.org/1999/02/22-rdf-syntax-ns#}about"),
+		            digest.findall(
+		                "{http://www.wizards-toolkit.org/digest/1.0/}Content"
+		            )
+		        )
+		    )
 		)
+		release_filename = releases[len(releases) - 1]
+
+		magick_archive_path = download(magick_url + release_filename, libs_dir)
 		magick_extract_dir = os.path.join(libs_dir, "magick")
 		unzip(magick_archive_path, magick_extract_dir)
 		os.rename(
