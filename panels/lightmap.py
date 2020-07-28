@@ -16,7 +16,8 @@ class LightmapPanel(bpy.types.Panel):
 		layout.label(icon="ERROR", text="Warning!")
 		caution = layout.column(align=True)
 		caution.label(text="Please use with all caution.")
-		caution.label(text="This is very experimental.")
+		caution.label(text="This is very experimental")
+		caution.label(text="and might not even work.")
 		caution.label(text="Make a copy of your project first!")
 		caution.prop(
 		    tivoli_settings,
