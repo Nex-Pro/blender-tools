@@ -2,7 +2,7 @@ bl_info = {
     "name": "Tivoli Blender Tools",
     "author": "Tivoli Cloud VR, Inc.",
     "description": "",
-    "version": (0, 0, 1),
+    "version": (0, 0, 0),
     "blender": (2, 82, 0),
     "location": "View 3D > Tool Shelf > Tivoli",
     "warning": "",

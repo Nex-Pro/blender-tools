@@ -1,0 +1,47 @@
+stages:
+    - build
+    - release
+
+.release:
+    only:
+        - /^[0-9]+?\.[0-9]+?\.[0-9]+?$/i
+
+variables:
+    NAME: tivoli-blender-tools
+
+build:
+    stage: build
+    image: python:alpine
+    extends: .release
+    script:
+        - apk add zip
+
+        # update version
+        - export VERSION_CSV=$(echo $CI_COMMIT_TAG | sed "s/\./, /g")
+        - sed -i "s/(0, 0, 0)/("$VERSION_CSV")/" __init__.py
+
+        - python download_libs.py nt
+        - zip -r $NAME-$CI_COMMIT_TAG-windows.zip $NAME
+        - rm -rf $NAME/libs
+
+        - python download_libs.py posix
+        - zip -r $NAME-$CI_COMMIT_TAG-linux.zip $NAME
+        - rm -rf $NAME/libs
+    artifacts:
+        expire_in: 99999 years
+        paths:
+            - $NAME-$CI_COMMIT_TAG-windows.zip
+            - $NAME-$CI_COMMIT_TAG-linux.zip
+
+release:
+    stage: release
+    image: registry.gitlab.com/gitlab-org/release-cli:latest
+    extends: .release
+    script:
+        - release-cli create
+          --name "Tivoli Blender Tools $CI_COMMIT_TAG"
+          --description ""
+          --assets-links-name "$NAME-$CI_COMMIT_TAG-windows.zip"
+          --assets-links-url "$CI_PROJECT_URL/-/jobs/artifacts/$CI_COMMIT_SHORT_SHA/raw/$NAME-$CI_COMMIT_TAG-windows.zip?job=build"
+          --assets-links-name "$NAME-$CI_COMMIT_TAG-linux.zip"
+          --assets-links-url "$CI_PROJECT_URL/-/jobs/artifacts/$CI_COMMIT_SHORT_SHA/raw/$NAME-$CI_COMMIT_TAG-linux.zip?job=build"
