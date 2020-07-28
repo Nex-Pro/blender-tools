@@ -14,7 +14,7 @@ build:
     image: python:alpine
     extends: .release
     script:
-        - apk add zip
+        - apk add coreutils zip
 
         # update version
         - export VERSION_CSV=$(echo $CI_COMMIT_TAG | sed "s/\./, /g")
