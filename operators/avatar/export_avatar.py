@@ -2,6 +2,7 @@ import bpy
 import os
 import shutil
 import json
+import subprocess
 
 from bpy_extras.io_utils import ExportHelper
 
@@ -16,11 +17,11 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	filename_ext = ".fst"
 	filter_glob: bpy.props.StringProperty(default="*.fst", options={"HIDDEN"})
 
-	# webp_textures: bpy.props.BoolProperty(
-	#     default=True,
-	#     name="WebP texture optimize",
-	#     description="Convert all textures to WebP"
-	# )
+	webp_textures: bpy.props.BoolProperty(
+	    default=True,
+	    name="WebP texture optimize",
+	    description="Convert all textures to WebP"
+	)
 
 	# make_folder: bpy.props.BoolProperty(
 	#	 default=True,
@@ -30,7 +31,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 	def draw(self, context):
 		layout = self.layout
-		# layout.prop(self, "webp_textures")
+		layout.prop(self, "webp_textures")
 		# layout.prop(self, "make_folder")
 
 	def execute(self, context):
@@ -109,9 +110,12 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 			shutil.rmtree(fbm_path)
 
 		# make material map
-		make_material_map_output = make_material_map(objects)
+		make_material_map_output = make_material_map(
+		    objects, self.webp_textures
+		)
 		material_map = make_material_map_output["material_map"]
 		images_to_save = make_material_map_output["images_to_save"]
+		images_to_convert = make_material_map_output["images_to_convert"]
 
 		# save images from custom tivoli settings node
 		for image in images_to_save:
@@ -122,6 +126,22 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 			)
 			tmp_image.save()
 			bpy.data.images.remove(tmp_image)
+
+		# convert images to webp
+		if self.webp_textures:
+			for images in images_to_convert:
+				input_path = os.path.join(export_path, images[0])
+				output_path = os.path.join(export_path, images[1])
+				process = subprocess.Popen(
+				    [
+				        utils.get_cwebp_path(), "-mt", "-q", "90", input_path,
+				        "-o", output_path
+				    ],
+				    stdout=None,
+				    stderr=None
+				)
+				process.communicate()
+				os.remove(input_path)
 
 		# write fst file
 		fst_file = open(fst_filepath, "w")
