@@ -8,8 +8,6 @@ No compiled releases exist yet so you have to do it manually.
     python download_libs.py
     ```
 
-    If using Linux, Make sure `imagemagick` is install on your system.
-
 -   Then load the repo dir as addon in Blender using a symbolic link.
 
 ## Developing

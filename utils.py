@@ -123,13 +123,18 @@ def get_oidn_path():
 	    os.path.dirname(os.path.realpath(__file__)), "libs/oidn/bin/denoise"
 	) + (".exe" if os.name == "nt" else "")
 
-def get_magick_path():
-	if os.name == "posix":
-		return which("magick")
-	elif os.name == "nt":
-		return os.path.join(
-		    os.path.dirname(os.path.realpath(__file__)), "libs/magick.exe"
-		)
+# def get_magick_path():
+# 	if os.name == "posix":
+# 		return which("magick")
+# 	elif os.name == "nt":
+# 		return os.path.join(
+# 		    os.path.dirname(os.path.realpath(__file__)), "libs/magick.exe"
+# 		)
+
+def get_cwebp_path():
+	return os.path.join(
+	    os.path.dirname(os.path.realpath(__file__)), "libs/cwebp"
+	) + (".exe" if os.name == "nt" else "")
 
 def replace_filename_ext(filename, new_ext):
 	new_filename = filename.split(".")
