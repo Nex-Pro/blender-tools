@@ -130,3 +130,18 @@ def get_magick_path():
 		return os.path.join(
 		    os.path.dirname(os.path.realpath(__file__)), "libs/magick.exe"
 		)
+
+def replace_filename_ext(filename, new_ext):
+	new_filename = filename.split(".")
+	new_filename.pop()
+	return ".".join(new_filename) + new_ext
+
+def is_in_parent_tree(start_obj, query_obj):
+	current_obj = start_obj
+
+	while current_obj != None:
+		if current_obj == query_obj:
+			return True
+		current_obj = current_obj.parent
+
+	return False
