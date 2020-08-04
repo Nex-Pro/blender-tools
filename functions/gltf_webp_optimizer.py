@@ -64,13 +64,18 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 			#         webp_path
 			#     ]
 			# )
-			commands.append(
-			    [
-			        utils.get_cwebp_path(), "-mt", "-q",
-			        str(quality), "-lossless", ("on" if lossless else "off"),
-			        path, "-o", webp_path
-			    ]
-			)
+
+			arguments = [
+			    utils.get_cwebp_path(),
+			    "-mt",
+			    "-q",
+			    str(quality),
+			]
+			if (lossless):
+				arguments.append("-lossless")
+			arguments.append(path, "-o", webp_path)
+
+			commands.append(arguments)
 
 		old_images.append(path)
 
