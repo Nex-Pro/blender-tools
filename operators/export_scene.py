@@ -2,6 +2,8 @@ import bpy
 import os
 import shutil
 import json
+import math
+import time
 from mathutils import Vector, Quaternion
 from .. import utils
 from ..functions.gltf_webp_optimizer import *
@@ -234,7 +236,7 @@ class ExportScene(bpy.types.Operator):
 					gltf_webp_optimizer(mesh_filepath)
 
 			# gather information
-			url = "./" + mesh_filename
+			url = "./" + mesh_filename + "?" + str(math.floor(time.time()))
 
 			matrix = obj.matrix_world
 
