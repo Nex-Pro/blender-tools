@@ -73,6 +73,7 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 
 		old_images.append(path)
 
+		image["mimeType"] = "image/webp"
 		image["uri"] = webp_filename
 		write_new_gltf = True
 

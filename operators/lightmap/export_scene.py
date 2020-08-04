@@ -65,14 +65,9 @@ class LightmapExportScene(bpy.types.Operator):
 
 			export_path = os.path.join(export_dir, image.name)
 
-			if self.webp_textures:
-				# dont convert image
-				image.filepath_raw = export_path + "." + utils.image_ext(image)
-				image.save()
-			else:
-				image.filepath_raw = export_path + LIGHTMAP_EXT
-				image.file_format = LIGHTMAP_TYPE
-				image.save()
+			image.filepath_raw = export_path + LIGHTMAP_EXT
+			image.file_format = LIGHTMAP_TYPE
+			image.save()
 
 			# restore image
 			image.filepath_raw = previous_filepath_raw
@@ -81,6 +76,7 @@ class LightmapExportScene(bpy.types.Operator):
 		# modify gltf
 		def modify_gltf(filepath):
 			if self.webp_textures:
+				# modify non lightmap textures first
 				gltf_webp_optimizer(filepath)
 
 			file = open(filepath, "r")
@@ -93,22 +89,13 @@ class LightmapExportScene(bpy.types.Operator):
 				if "textures" not in data:
 					data["textures"] = []
 
-				if self.webp_textures:
-					data["images"].append(
-					    {
-					        "mimeType": "",  # will be written by optimizer
-					        "name": image.name,
-					        "uri": image.name + "." + utils.image_ext(image),
-					    }
-					)
-				else:
-					data["images"].append(
-					    {
-					        "mimeType": LIGHTMAP_MIMETYPE,
-					        "name": image.name,
-					        "uri": image.name + LIGHTMAP_EXT,
-					    }
-					)
+				data["images"].append(
+				    {
+				        "mimeType": LIGHTMAP_MIMETYPE,
+				        "name": image.name,
+				        "uri": image.name + LIGHTMAP_EXT,
+				    }
+				)
 
 				source = len(data["images"]) - 1
 
@@ -126,9 +113,6 @@ class LightmapExportScene(bpy.types.Operator):
 				image_name = "Tivoli_Lightmap_" + obj.name
 				image = utils.find_image(image_name)
 				texture_index = add_texture(image)
-
-				print(image_name)
-				print(texture_index)
 
 				material["lightmapTexture"] = {
 				    "index": texture_index,
