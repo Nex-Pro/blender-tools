@@ -11,10 +11,6 @@ class LightmapExportScene(bpy.types.Operator):
 	bl_label = "Tivoli: Lightmap Export Scene"
 	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
-	base_url: bpy.props.StringProperty(
-	    name="Base URL", default="", options={"HIDDEN"}
-	)
-
 	webp_textures: bpy.props.BoolProperty(
 	    name="WebP textures", default=False, options={"HIDDEN"}
 	)
@@ -40,10 +36,7 @@ class LightmapExportScene(bpy.types.Operator):
 		export_dir = os.path.join(project_dir, project_name)
 
 		if self.as_json:
-			bpy.ops.tivoli.export_scene(
-			    webp_textures=self.webp_textures,
-			    base_url=self.base_url,
-			)
+			bpy.ops.tivoli.export_scene(webp_textures=self.webp_textures)
 		else:
 			if os.path.exists(export_dir):
 				shutil.rmtree(export_dir)

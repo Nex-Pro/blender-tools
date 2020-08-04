@@ -13,8 +13,6 @@ class ExportScenePanel(bpy.types.Panel):
 		layout = self.layout
 		tivoli_settings = context.scene.tivoli_settings
 
-		layout.label(text="Export URL", icon="URL")
-		layout.prop(tivoli_settings, "export_scene_url", text="")
 		layout.prop(tivoli_settings, "export_scene_webp")
 
 		op = layout.operator(
@@ -22,5 +20,4 @@ class ExportScenePanel(bpy.types.Panel):
 		    text="Export scene to JSON",
 		    operator="tivoli.export_scene"
 		)
-		op.base_url = tivoli_settings.export_scene_url
 		op.webp_textures = tivoli_settings.export_scene_webp

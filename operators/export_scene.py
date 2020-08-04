@@ -97,10 +97,6 @@ class ExportScene(bpy.types.Operator):
 	bl_label = "Tivoli: Export scene to JSON"
 	bl_options = {"REGISTER", "UNDO", "INTERNAL"}
 
-	base_url: bpy.props.StringProperty(
-	    name="Base URL", default="", options={"HIDDEN"}
-	)
-
 	webp_textures: bpy.props.BoolProperty(
 	    name="WebP textures", default=False, options={"HIDDEN"}
 	)
@@ -126,13 +122,6 @@ class ExportScene(bpy.types.Operator):
 		# textures_dir = os.path.join(project_export_dir, "textures")
 		# os.makedirs(textures_dir)
 		textures_dir = os.path.join(project_export_dir)
-
-		# make export dir
-		base_url = self.base_url.strip()
-		if base_url == "":
-			base_url = "file://" + project_export_dir
-		if not base_url.endswith("/"):
-			base_url += "/"
 
 		# make sure all objects are valid
 		for obj in scene.objects:
@@ -245,11 +234,7 @@ class ExportScene(bpy.types.Operator):
 					gltf_webp_optimizer(mesh_filepath)
 
 			# gather information
-			url = base_url + mesh_filename
-			if url.startswith("file://"):
-				url = url.replace("\\", "/")
-			if os.name == "nt":
-				url = url.replace("file://", "file:///")
+			url = "./" + mesh_filename
 
 			matrix = obj.matrix_world
 
