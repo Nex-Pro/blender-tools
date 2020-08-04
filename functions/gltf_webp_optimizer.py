@@ -73,7 +73,7 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 			]
 			if (lossless):
 				arguments.append("-lossless")
-			arguments.append(path, "-o", webp_path)
+			arguments.extend([path, "-o", webp_path])
 
 			commands.append(arguments)
 
