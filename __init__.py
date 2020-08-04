@@ -17,6 +17,7 @@ from .settings import *
 from .operators.avatar.add_armature import *
 from .operators.avatar.add_tivoli_settings_node import *
 from .operators.avatar.export_avatar import *
+from .operators.avatar.force_tpose import *
 from .operators.lightmap.prepare_uv_maps import *
 from .operators.lightmap.prepare_materials import *
 from .operators.lightmap.bake_scene import *
@@ -33,6 +34,7 @@ classes = (
     AvatarAddArmature,
     AvatarExportAvatar,
     AvatarAddTivoliSettingsNode,
+    AvatarForceTPose,
     LightmapPrepareUVMaps,
     LightmapPrepareMaterials,
     LightmapBakeScene,

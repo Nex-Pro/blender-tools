@@ -88,6 +88,8 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 				obj.select_set(state=True)
 				objects.append(obj)
 
+		bpy.ops.tivoli.avatar_force_tpose(clear=False)
+
 		bpy.ops.export_scene.fbx(
 		    filepath=fbx_filepath,
 		    use_selection=True,

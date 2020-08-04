@@ -12,6 +12,8 @@ class AvatarPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 
+		# layout.label(text="Things to add", icon="PLUS")
+
 		layout.operator(
 		    icon="OUTLINER_OB_ARMATURE",
 		    text="Add Tivoli armature",
@@ -23,3 +25,23 @@ class AvatarPanel(bpy.types.Panel):
 		    text="Add Tivoli settings node",
 		    operator="tivoli.avatar_add_tivoli_settings_node"
 		)
+
+		layout.separator()
+		# layout.label(text="Fix armature", icon="OUTLINER_OB_ARMATURE")
+
+		tpose = layout.row()
+		op = tpose.operator(
+		    icon="OUTLINER_OB_ARMATURE",
+		    text="Force T-Pose",
+		    operator="tivoli.avatar_force_tpose"
+		)
+		op.clear = False
+		op = tpose.operator(
+		    icon="ARMATURE_DATA",
+		    text="Clear T-Pose",
+		    operator="tivoli.avatar_force_tpose"
+		)
+		op.clear = True
+
+		# layout.label(text="Fix rotations")
+		# layout.label(text="Rename bones")
