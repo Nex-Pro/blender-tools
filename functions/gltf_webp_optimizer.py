@@ -2,6 +2,7 @@ import os
 import json
 import subprocess
 import threading
+import urllib.parse
 from .. import utils
 
 tivoli_max_texture_size = "8192x8192"
@@ -38,7 +39,7 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 	old_images = []
 
 	for image in gltf["images"]:
-		filename = image["uri"]
+		filename = urllib.parse.unquote(image["uri"])
 		if filename.endswith(".webp"):
 			continue
 
@@ -74,7 +75,7 @@ def gltf_webp_optimizer(gltf_path, quality=90, lossless=False):
 		old_images.append(path)
 
 		image["mimeType"] = "image/webp"
-		image["uri"] = webp_filename
+		image["uri"] = urllib.parse.quote(webp_filename)
 		write_new_gltf = True
 
 	threads = []
