@@ -106,7 +106,8 @@ def make_material_map(objects, to_webp=False):
 			# https://apidocs.tivolicloud.com/Graphics.html#.Material
 
 			if tivoli and tivoli.inputs["Unlit"].default_value:
-				process("color", "Base Color", "albedo")
+				# export emissive as unlit color
+				process("color", "Emission", "albedo")
 				material_data["unlit"] = True
 
 			else:
