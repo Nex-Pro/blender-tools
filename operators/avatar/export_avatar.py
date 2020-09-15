@@ -88,7 +88,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 				obj.select_set(state=True)
 				objects.append(obj)
 
-		bpy.ops.tivoli.avatar_force_tpose(clear=False)
+		# bpy.ops.tivoli.avatar_force_tpose(clear=False)
 
 		bpy.ops.export_scene.fbx(
 		    filepath=fbx_filepath,
@@ -133,17 +133,18 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		if self.webp_textures:
 			for images in images_to_convert:
 				input_path = os.path.join(export_path, images[0])
-				output_path = os.path.join(export_path, images[1])
-				process = subprocess.Popen(
-				    [
-				        utils.get_cwebp_path(), "-mt", "-q", "90", input_path,
-				        "-o", output_path
-				    ],
-				    stdout=None,
-				    stderr=None
-				)
-				process.communicate()
-				os.remove(input_path)
+				if os.path.isfile(input_path):
+					output_path = os.path.join(export_path, images[1])
+					process = subprocess.Popen(
+					    [
+					        utils.get_cwebp_path(), "-mt", "-q", "90",
+					        input_path, "-o", output_path
+					    ],
+					    stdout=None,
+					    stderr=None
+					)
+					process.communicate()
+					os.remove(input_path)
 
 		# write fst file
 		fst_file = open(fst_filepath, "w")

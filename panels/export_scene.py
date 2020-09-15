@@ -21,3 +21,5 @@ class ExportScenePanel(bpy.types.Panel):
 		    operator="tivoli.export_scene"
 		)
 		op.webp_textures = tivoli_settings.export_scene_webp
+
+		layout.separator()

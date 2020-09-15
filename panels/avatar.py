@@ -27,21 +27,28 @@ class AvatarPanel(bpy.types.Panel):
 		)
 
 		layout.separator()
-		# layout.label(text="Fix armature", icon="OUTLINER_OB_ARMATURE")
+		layout.label(text="Preview and fix your avatar")
 
-		tpose = layout.row()
-		op = tpose.operator(
-		    icon="OUTLINER_OB_ARMATURE",
-		    text="Force T-Pose",
-		    operator="tivoli.avatar_force_tpose"
-		)
-		op.clear = False
-		op = tpose.operator(
-		    icon="ARMATURE_DATA",
-		    text="Clear T-Pose",
-		    operator="tivoli.avatar_force_tpose"
-		)
-		op.clear = True
+		# tpose = layout.row()
+		# op = tpose.operator(
+		#     icon="OUTLINER_OB_ARMATURE",
+		#     text="Force T-Pose",
+		#     operator="tivoli.avatar_force_tpose"
+		# )
+		# op.clear = False
+		# op = tpose.operator(
+		#     icon="ARMATURE_DATA",
+		#     text="Clear T-Pose",
+		#     operator="tivoli.avatar_force_tpose"
+		# )
+		# op.clear = True
 
-		# layout.label(text="Fix rotations")
+		layout.operator(
+		    icon="BONE_DATA",
+		    text="Fix bone rotations",
+		    operator="tivoli.avatar_fix_bone_rotations"
+		)
+
+		layout.separator()
+
 		# layout.label(text="Rename bones")
