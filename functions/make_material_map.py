@@ -23,15 +23,20 @@ def make_material_map(objects, to_webp=False):
 			if material_map_key in material_map:
 				continue
 
-			# get principled shader
+			# get principled shader and tivoli settings node
 			nodes = material.node_tree.nodes
 
-			bsdf = None
+			material_output = None
 			for node in nodes:
-				if node.type == "BSDF_PRINCIPLED":
-					bsdf = node
-					break
-			if bsdf == None:
+				if node.type == "OUTPUT_MATERIAL":
+					material_output = node
+			if material_output == None:
+				continue
+
+			bsdf = None
+			if (len(material_output.inputs["Surface"].links) > 0):
+				bsdf = material_output.inputs["Surface"].links[0].from_node
+			if bsdf == None or bsdf.type != "BSDF_PRINCIPLED":
 				continue
 
 			tivoli = None
@@ -40,16 +45,6 @@ def make_material_map(objects, to_webp=False):
 					if node.node_tree == get_tivoli_settings_node():
 						tivoli = node
 						break
-
-			# get tivoli shader
-			nodes = material.node_tree.nodes
-			bsdf = None
-			for node in nodes:
-				if node.type == "BSDF_PRINCIPLED":
-					bsdf = node
-					break
-			if bsdf == None:
-				continue
 
 			# write material data
 			material_data = {
