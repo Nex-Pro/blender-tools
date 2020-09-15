@@ -32,14 +32,17 @@ class AvatarFixBoneRotations(bpy.types.Operator):
 		bottom_left = list(map(lambda bone: "Left" + bone, bottom))
 
 		top = [
-		    "Shoulder", "Arm", "ForeArm", "Hand", "HandThumb1", "HandThumb2",
-		    "HandThumb3", "HandThumb4", "HandIndex1", "HandIndex2",
+		    "Shoulder", "Arm", "ForeArm", "Hand", "HandIndex1", "HandIndex2",
 		    "HandIndex3", "HandIndex4", "HandMiddle1", "HandMiddle2",
 		    "HandMiddle3", "HandMiddle4", "HandRing1", "HandRing2", "HandRing3",
 		    "HandRing4", "HandPinky1", "HandPinky2", "HandPinky3", "HandPinky4"
 		]
+		top_thumb = ["HandThumb1", "HandThumb2", "HandThumb3", "HandThumb4"]
+
 		top_right = list(map(lambda bone: "Right" + bone, top))
+		top_right_thumb = list(map(lambda bone: "Right" + bone, top_thumb))
 		top_left = list(map(lambda bone: "Left" + bone, top))
+		top_left_thumb = list(map(lambda bone: "Left" + bone, top_thumb))
 
 		armature = bpy.context.active_object.data
 
@@ -52,9 +55,12 @@ class AvatarFixBoneRotations(bpy.types.Operator):
 			bpy.ops.armature.roll_clear(roll=roll)
 
 		clear_bones_roll(bottom_right, -math.pi)  # -180
-		clear_bones_roll(bottom_left, +math.pi)  # +180
 		clear_bones_roll(top_right, -math.pi / 2)  # -90
+		clear_bones_roll(top_right_thumb, -0)  # -0
+
+		clear_bones_roll(bottom_left, +math.pi)  # +180
 		clear_bones_roll(top_left, +math.pi / 2)  # +90
+		clear_bones_roll(top_left_thumb, +0)  # +0
 
 		# deselect and restore view
 		bpy.ops.armature.select_all(action="DESELECT")
