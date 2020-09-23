@@ -2,7 +2,7 @@ import bpy
 
 class TivoliSettings(bpy.types.PropertyGroup):
 	export_scene_webp: bpy.props.BoolProperty(
-	    name="WebP texture optimize", default=True
+	    name="WebP texture optimize", default=False
 	)
 
 	# ---
@@ -35,7 +35,7 @@ class TivoliSettings(bpy.types.PropertyGroup):
 	    name="Export scene as JSON", default=True
 	)
 	bake_export_webp: bpy.props.BoolProperty(
-	    name="WebP texture optimize", default=True
+	    name="WebP texture optimize", default=False
 	)
 
 	bake_current: bpy.props.StringProperty(name="Object", default="")
