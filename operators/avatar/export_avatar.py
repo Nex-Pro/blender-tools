@@ -18,7 +18,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	filter_glob: bpy.props.StringProperty(default="*.fst", options={"HIDDEN"})
 
 	webp_textures: bpy.props.BoolProperty(
-	    default=True,
+	    default=False,
 	    name="WebP texture optimize",
 	    description="Convert all textures to WebP"
 	)
