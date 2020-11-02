@@ -5,8 +5,17 @@ from typing import Union
 from .tivoli_settings_node import *
 from .. import utils
 
-def color_to_array(color):
-	return [color[0], color[1], color[2]]
+def color_to_tivoli(color):
+	# false means disable srgb so it's linear
+	return [color[0], color[1], color[2], False]
+
+	# def float_to_hex(value):
+	# 	value = round(value * 255)
+	# 	if value > 255:
+	# 		value = 255
+	# 	return hex(value)[2:].zfill(2)
+
+	# return "#" + "".join(map(float_to_hex, [color[0], color[1], color[2]]))
 
 def make_material_map(objects, to_webp=False):
 	material_map = {}
@@ -34,10 +43,19 @@ def make_material_map(objects, to_webp=False):
 				continue
 
 			bsdf = None
+			unlit_color = None
+			unlit_texture = None
+
 			if (len(material_output.inputs["Surface"].links) > 0):
-				bsdf = material_output.inputs["Surface"].links[0].from_node
-			if bsdf == None or bsdf.type != "BSDF_PRINCIPLED":
-				continue
+				output = material_output.inputs["Surface"].links[0].from_node
+				if output.type == "BSDF_PRINCIPLED":
+					bsdf = output
+				elif output.type == "RGB":
+					unlit_color = output
+				elif output.type == "TEX_IMAGE":
+					unlit_texture = output
+				else:
+					continue
 
 			tivoli = None
 			for node in nodes:
@@ -94,16 +112,32 @@ def make_material_map(objects, to_webp=False):
 					if input_type == "value":
 						material_data[output_key] = node_input.default_value
 					else:
-						material_data[output_key] = color_to_array(
+						material_data[output_key] = color_to_tivoli(
 						    node_input.default_value
 						)
 
 			# https://apidocs.tivolicloud.com/Graphics.html#.Material
 
-			if tivoli and tivoli.inputs["Unlit"].default_value:
-				# export emissive as unlit color
-				process("color", "Emission", "albedo")
+			if bsdf == None:
 				material_data["unlit"] = True
+
+				if unlit_color != None:
+					material_data["albedo"] = color_to_tivoli(
+					    unlit_color.outputs[0].default_value
+					)
+
+				if unlit_texture != None:
+					filepath = unlit_texture.image.filepath
+					filename = re.split("[\\/\\\]", filepath).pop()
+
+					if to_webp:
+						old_filename = filename
+						filename = utils.replace_filename_ext(filename, ".webp")
+						images_to_convert.append([old_filename, filename])
+
+					material_data["albedoMap"] = filename
+
+					images_to_save.append(unlit_texture.image)
 
 			else:
 				process("color", "Base Color", "albedo")

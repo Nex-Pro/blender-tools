@@ -12,7 +12,6 @@ def get_tivoli_settings_node():
 		# create a new node group
 		node_group = bpy.data.node_groups.new(node_group_name, "ShaderNodeTree")
 
-		node_group.inputs.new("NodeSocketBool", "Unlit")
 		node_group.inputs.new("NodeSocketFloat", "Occlusion")
 		# node_group.inputs.new("NodeSocketFloat", "Lightmap")
 
