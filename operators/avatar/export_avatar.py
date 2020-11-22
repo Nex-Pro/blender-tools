@@ -23,6 +23,12 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	    description="Convert all textures to WebP"
 	)
 
+	gltf_export: bpy.props.BoolProperty(
+	    default=False,
+	    name="glTF export (experimental)",
+	    description="Uses glTF instead of FBX"
+	)
+
 	# make_folder: bpy.props.BoolProperty(
 	#	 default=True,
 	#	 name="Make folder for avatar",
@@ -32,6 +38,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	def draw(self, context):
 		layout = self.layout
 		layout.prop(self, "webp_textures")
+		layout.prop(self, "gltf_export")
 		# layout.prop(self, "make_folder")
 
 	def execute(self, context):
@@ -60,9 +67,11 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 			)
 
 		fst_filepath = self.filepath
-		fbx_filepath = utils.replace_filename_ext(self.filepath, ".fbx")
 		export_path = os.path.dirname(self.filepath)
-		fbm_path = os.path.join(export_path, avatar_name + ".fbm")
+		if self.gltf_export:
+			model_filepath = utils.replace_filename_ext(self.filepath, ".gltf")
+		else:
+			model_filepath = utils.replace_filename_ext(self.filepath, ".fbx")
 
 		# select all active from first armature
 		utils.deselect_all()
@@ -90,26 +99,37 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 		# bpy.ops.tivoli.avatar_force_tpose(clear=False)
 
-		bpy.ops.export_scene.fbx(
-		    filepath=fbx_filepath,
-		    use_selection=True,
-		    object_types={"ARMATURE", "MESH"},
-		    use_mesh_modifiers=True,
-		    path_mode="COPY",
-		    embed_textures=False,
-		)
+		if self.gltf_export:
+			bpy.ops.export_scene.gltf(
+			    filepath=model_filepath,
+			    export_format="GLTF_SEPARATE",
+			    export_image_format="AUTO",
+			    use_selection=True,
+			    export_apply=True
+			)
+		else:
+			bpy.ops.export_scene.fbx(
+			    filepath=model_filepath,
+			    use_selection=True,
+			    object_types={"ARMATURE", "MESH"},
+			    use_mesh_modifiers=True,
+			    path_mode="COPY",
+			    embed_textures=False,
+			)
 
 		utils.deselect_all()
 
-		# move all from .fbm into export folder
-		if os.path.isdir(fbm_path):
-			files = os.listdir(fbm_path)
-			for filename in files:
-				shutil.move(
-				    os.path.join(fbm_path, filename),
-				    os.path.join(export_path, filename)
-				)
-			shutil.rmtree(fbm_path)
+		if not self.gltf_export:
+			# move all from .fbm into export folder
+			fbm_path = os.path.join(export_path, avatar_name + ".fbm")
+			if os.path.isdir(fbm_path):
+				files = os.listdir(fbm_path)
+				for filename in files:
+					shutil.move(
+					    os.path.join(fbm_path, filename),
+					    os.path.join(export_path, filename)
+					)
+				shutil.rmtree(fbm_path)
 
 		# make material map
 		make_material_map_output = make_material_map(
@@ -151,7 +171,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		fst = "name = " + avatar_name + "\n"
 		fst += "type = body+head\n"
 		fst += "scale = 1\n"
-		fst += "filename = " + os.path.basename(fbx_filepath) + "\n"
+		fst += "filename = " + os.path.basename(model_filepath) + "\n"
 		fst += "texdir = .\n"
 		fst += "joint = jointRoot = Hips\n"
 		fst += "joint = jointLean = Spine\n"
