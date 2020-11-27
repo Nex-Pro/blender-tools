@@ -46,7 +46,7 @@ def make_material_map(objects, to_webp=False):
 			unlit_color = None
 			unlit_texture = None
 
-			if (len(material_output.inputs["Surface"].links) > 0):
+			if len(material_output.inputs["Surface"].links) > 0:
 				output = material_output.inputs["Surface"].links[0].from_node
 				if output.type == "BSDF_PRINCIPLED":
 					bsdf = output
@@ -54,8 +54,17 @@ def make_material_map(objects, to_webp=False):
 					unlit_color = output
 				elif output.type == "TEX_IMAGE":
 					unlit_texture = output
-				else:
-					continue
+				elif output.type == "MIX_SHADER":
+					# incase a mix shader is used for transparecy
+					if len(output.inputs[2].links) > 0:
+						output = output.inputs[2].links[0].from_node
+						if output.type == "RGB":
+							unlit_color = output
+						elif output.type == "TEX_IMAGE":
+							unlit_texture = output
+
+			if bsdf == None and unlit_color == None and unlit_texture == None:
+				continue
 
 			tivoli = None
 			for node in nodes:
@@ -136,6 +145,7 @@ def make_material_map(objects, to_webp=False):
 						images_to_convert.append([old_filename, filename])
 
 					material_data["albedoMap"] = filename
+					material_data["opacityMap"] = filename
 
 					images_to_save.append(unlit_texture.image)
 
@@ -152,18 +162,18 @@ def make_material_map(objects, to_webp=False):
 					process("value", "Occlusion", "occlusion", True, True)
 					# process("value", "Lightmap", "light", True, True)
 
-				if material.blend_method == "OPAQUE":
-					material_data["opacityMapMode"] = "OPACITY_MAP_OPAQUE"
-				elif material.blend_method == "CLIP":
-					material_data["opacityMapMode"] = "OPACITY_MAP_MASK"
-					material_data["opacityCutoff"] = material.alpha_threshold
-				elif material.blend_method == "HASHED" or material.blend_method == "BLEND":
-					material_data["opacityMapMode"] = "OPACITY_MAP_BLEND"
+			if material.blend_method == "OPAQUE":
+				material_data["opacityMapMode"] = "OPACITY_MAP_OPAQUE"
+			elif material.blend_method == "CLIP":
+				material_data["opacityMapMode"] = "OPACITY_MAP_MASK"
+				material_data["opacityCutoff"] = material.alpha_threshold
+			elif material.blend_method == "HASHED" or material.blend_method == "BLEND":
+				material_data["opacityMapMode"] = "OPACITY_MAP_BLEND"
 
-				if material.use_backface_culling:
-					material_data["cullFaceMode"] = "CULL_BACK"
-				else:
-					material_data["cullFaceMode"] = "CULL_NONE"
+			if material.use_backface_culling:
+				material_data["cullFaceMode"] = "CULL_BACK"
+			else:
+				material_data["cullFaceMode"] = "CULL_NONE"
 
 			# add to map
 			material_map[material_map_key] = {"materials": material_data}
