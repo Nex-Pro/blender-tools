@@ -2,7 +2,8 @@ import bpy
 import subprocess
 import os
 from uuid import uuid4
-from mathutils import Vector
+from mathutils import Vector, Euler
+from math import pi
 
 def is_obj_bakeable(obj):
 	return (
@@ -150,3 +151,31 @@ def is_in_parent_tree(start_obj, query_obj):
 		current_obj = current_obj.parent
 
 	return False
+
+# https://github.com/Menithal/Blender-Metaverse-Addon/blob/master/metaverse_tools/utils/bones/bones_builder.py#L620
+
+def reset_scale_rotation(obj):
+	mode = bpy.context.area.type
+	bpy.context.area.type = "VIEW_3D"
+	bpy.ops.object.mode_set(mode="OBJECT")
+	bpy.ops.view3d.snap_cursor_to_center('INVOKE_DEFAULT')
+	bpy.context.area.type = mode
+	bpy.ops.object.select_all(action="DESELECT")
+
+	obj.select_set(True)
+	bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+
+	mode = mode
+
+def correct_scale_rotation(obj, rotation):
+	str_angle = -90 * pi / 180
+
+	reset_scale_rotation(obj)
+	obj.scale = Vector((100.0, 100.0, 100.0))
+	if rotation:
+		obj.rotation_euler = Euler((str_angle, 0, 0), "XYZ")
+
+	reset_scale_rotation(obj)
+	obj.scale = Vector((0.01, 0.01, 0.01))
+	if rotation:
+		obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")

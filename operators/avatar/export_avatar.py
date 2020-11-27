@@ -94,8 +94,22 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 			    obj.visible_get() and obj.type == "MESH" and
 			    utils.is_in_parent_tree(obj, armature)
 			):
-				obj.select_set(state=True)
 				objects.append(obj)
+
+		# make all meshes size 0.01 as well as armature but 90 deg on x axis
+		# this fixes the feet not staying on the ground
+
+		for obj in objects:
+			if obj is armature:
+				utils.correct_scale_rotation(obj, True)
+			else:
+				utils.correct_scale_rotation(obj, False)
+
+		# select all to export
+
+		utils.deselect_all()
+		for obj in objects:
+			obj.select_set(state=True)
 
 		# bpy.ops.tivoli.avatar_force_tpose(clear=False)
 
@@ -115,6 +129,9 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 			    use_mesh_modifiers=True,
 			    path_mode="COPY",
 			    embed_textures=False,
+			    add_leaf_bones=False,
+			    axis_forward="-Z",
+			    axis_up="Y"
 			)
 
 		utils.deselect_all()
