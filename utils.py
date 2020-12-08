@@ -155,17 +155,16 @@ def is_in_parent_tree(start_obj, query_obj):
 # https://github.com/Menithal/Blender-Metaverse-Addon/blob/master/metaverse_tools/utils/bones/bones_builder.py#L620
 
 def reset_scale_rotation(obj):
-	mode = bpy.context.area.type
-	bpy.context.area.type = "VIEW_3D"
-	bpy.ops.object.mode_set(mode="OBJECT")
-	bpy.ops.view3d.snap_cursor_to_center('INVOKE_DEFAULT')
-	bpy.context.area.type = mode
-	bpy.ops.object.select_all(action="DESELECT")
+	override = get_context_with_area("VIEW_3D", bpy.context)
+
+	bpy.ops.object.mode_set(override, mode="OBJECT")
+	bpy.ops.view3d.snap_cursor_to_center(override, 'INVOKE_DEFAULT')
+	bpy.ops.object.select_all(override, action="DESELECT")
 
 	obj.select_set(True)
-	bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
-
-	mode = mode
+	bpy.ops.object.transform_apply(
+	    override, location=False, rotation=True, scale=True
+	)
 
 def correct_scale_rotation(obj, rotation):
 	str_angle = -90 * pi / 180
