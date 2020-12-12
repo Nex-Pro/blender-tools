@@ -26,6 +26,12 @@ class AvatarPanel(bpy.types.Panel):
 		    operator="tivoli.avatar_add_tivoli_settings_node"
 		)
 
+		layout.operator(
+		    icon="NODETREE",
+		    text="Add \"glTF Settings\" node",
+		    operator="tivoli.avatar_add_gltf_settings_node"
+		)
+
 		layout.separator()
 		layout.label(text="Preview and fix your avatar")
 

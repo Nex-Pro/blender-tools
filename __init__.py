@@ -16,6 +16,7 @@ from .settings import *
 
 from .operators.avatar.add_armature import *
 from .operators.avatar.add_tivoli_settings_node import *
+from .operators.avatar.add_gltf_settings_node import *
 from .operators.avatar.export_avatar import *
 from .operators.avatar.force_tpose import *
 from .operators.avatar.fix_bone_rotations import *
@@ -35,6 +36,7 @@ classes = (
     AvatarAddArmature,
     AvatarExportAvatar,
     AvatarAddTivoliSettingsNode,
+    AvatarAddGltfSettingsNode,
     AvatarForceTPose,
     AvatarFixBoneRotations,
     # lightmap operators
