@@ -170,11 +170,11 @@ def correct_scale_rotation(obj, rotation):
 	str_angle = -90 * pi / 180
 
 	reset_scale_rotation(obj)
-	obj.scale = Vector((100.0, 100.0, 100.0))
+	# obj.scale = Vector((100.0, 100.0, 100.0))
 	if rotation:
 		obj.rotation_euler = Euler((str_angle, 0, 0), "XYZ")
 
 	reset_scale_rotation(obj)
-	obj.scale = Vector((0.01, 0.01, 0.01))
+	# obj.scale = Vector((0.01, 0.01, 0.01))
 	if rotation:
 		obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")
