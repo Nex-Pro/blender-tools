@@ -56,6 +56,8 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		    os.path.basename(self.filepath), ""
 		)
 
+		# TODO: delete folder if failed
+
 		# if not os.path.isfile(self.filepath) and self.make_folder:
 		if not os.path.isfile(self.filepath):
 			folder = os.path.join(os.path.dirname(self.filepath), avatar_name)
@@ -158,13 +160,20 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 		# save images from custom tivoli settings node
 		for image in images_to_save:
-			tmp_image = image.copy()
-			tmp_image.update()
-			tmp_image.filepath_raw = os.path.join(
-			    export_path, os.path.basename(image.filepath_raw)
+			# tmp_image = image.copy()
+			# tmp_image.update()
+			# tmp_image.filepath_raw = os.path.join(
+			#     export_path, os.path.basename(image.filepath_raw)
+			# )
+			# tmp_image.save()
+			# bpy.data.images.remove(tmp_image)
+			image_path = os.path.normpath(
+			    bpy.path.abspath(image.filepath, library=image.library)
 			)
-			tmp_image.save()
-			bpy.data.images.remove(tmp_image)
+			shutil.copy(
+			    image_path,
+			    os.path.join(export_path, os.path.basename(image.filepath_raw))
+			)
 
 		# convert images to webp
 		if self.webp_textures:
