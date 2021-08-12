@@ -38,6 +38,7 @@ def deselect_all_outliner(context=bpy.context):
 def select_only(obj):
 	deselect_all()
 	obj.select_set(state=True)
+	bpy.context.view_layer.objects.active = obj
 
 def find_material(name):
 	for mat in bpy.data.materials:
@@ -178,3 +179,9 @@ def correct_scale_rotation(obj, rotation):
 	# obj.scale = Vector((0.01, 0.01, 0.01))
 	if rotation:
 		obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")
+
+def addon_installed(addon_name: str):
+	for addon in bpy.context.preferences.addons:
+		if (addon.module == addon_name):
+			return True
+	return False

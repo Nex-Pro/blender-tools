@@ -25,10 +25,13 @@ from .operators.lightmap.prepare_materials import *
 from .operators.lightmap.bake_scene import *
 from .operators.lightmap.export_scene import *
 from .operators.export_scene import *
+from .operators.animation.shape_key_animation_to_bones import *
+from .operators.animation.bake_physics_with_mdd import *
 
 from .panels.avatar import *
 from .panels.lightmap import *
 from .panels.export_scene import *
+from .panels.animation import *
 
 classes = (
     TivoliSettings,
@@ -44,12 +47,16 @@ classes = (
     LightmapPrepareMaterials,
     LightmapBakeScene,
     LightmapExportScene,
-    # operators
+    # export scene operators
     ExportScene,
+    # animation operators
+    AnimationBakePhysicsWithMdd,
+    AnimationShapeKeyAnimationToBones,
     # panels
     AvatarPanel,
     ExportScenePanel,
     LightmapPanel,
+    AnimationPanel
 )
 
 # main_register, main_unregister = bpy.utils.register_classes_factory(classes)
