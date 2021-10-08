@@ -107,7 +107,7 @@ def download_oidn():
 
 def download_cwebp():
 	webp_url = "https://storage.googleapis.com/downloads.webmproject.org/releases/webp/"
-	webp_version = "libwebp-1.1.0"
+	webp_version = "libwebp-1.2.1"
 
 	if os.name == "posix":
 		webp_dir = webp_version + "-linux-x86-64"
