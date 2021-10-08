@@ -2,11 +2,11 @@
 
 ## Download
 
-You can find the latest releases here:
+### You can find the latest releases here:
 
 https://git.tivolicloud.com/tivolicloud/blender-tools/-/releases
 
-And the changelog here:
+### And the changelog here:
 
 https://docs.tivolicloud.com/blender-tools/changelog
 
