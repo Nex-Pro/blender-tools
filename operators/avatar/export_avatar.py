@@ -8,6 +8,7 @@ from bpy_extras.io_utils import ExportHelper
 
 from ... import utils
 from ...functions.make_material_map import *
+from ...functions.gltf_webp_optimizer import *
 
 class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	bl_idname = "tivoli.avatar_export_avatar"
@@ -25,7 +26,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 	webp_textures: bpy.props.BoolProperty(
 	    default=False,
-	    name="WebP textures (FBX only)",
+	    name="WebP textures",
 	    description="Convert all textures to WebP"
 	)
 
@@ -156,6 +157,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 		# make material map if fbx
 		material_map = None
+		images_to_convert = None
 
 		if not self.gltf_export:
 			make_material_map_output = make_material_map(
@@ -186,20 +188,23 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 		# convert images to webp
 		if self.webp_textures:
-			for images in images_to_convert:
-				input_path = os.path.join(export_path, images[0])
-				if os.path.isfile(input_path):
-					output_path = os.path.join(export_path, images[1])
-					process = subprocess.Popen(
-					    [
-					        utils.get_cwebp_path(), "-mt", "-q", "90",
-					        input_path, "-o", output_path
-					    ],
-					    stdout=None,
-					    stderr=None
-					)
-					process.communicate()
-					os.remove(input_path)
+			if self.gltf_export:
+				gltf_webp_optimizer(model_filepath)
+			else:
+				for images in images_to_convert:
+					input_path = os.path.join(export_path, images[0])
+					if os.path.isfile(input_path):
+						output_path = os.path.join(export_path, images[1])
+						process = subprocess.Popen(
+						    [
+						        utils.get_cwebp_path(), "-mt", "-q", "90",
+						        input_path, "-o", output_path
+						    ],
+						    stdout=None,
+						    stderr=None
+						)
+						process.communicate()
+						os.remove(input_path)
 
 		# write fst file
 		fst_file = open(fst_filepath, "w")
