@@ -20,11 +20,15 @@ from .operators.avatar.add_gltf_settings_node import *
 from .operators.avatar.export_avatar import *
 from .operators.avatar.force_tpose import *
 from .operators.avatar.fix_bone_rotations import *
+from .operators.avatar.ensure_root_bone import *
+
 from .operators.lightmap.prepare_uv_maps import *
 from .operators.lightmap.prepare_materials import *
 from .operators.lightmap.bake_scene import *
 from .operators.lightmap.export_scene import *
+
 from .operators.export_scene import *
+
 from .operators.animation.shape_key_animation_to_bones import *
 from .operators.animation.bake_physics_with_mdd import *
 
@@ -42,6 +46,7 @@ classes = (
     AvatarAddGltfSettingsNode,
     AvatarForceTPose,
     AvatarFixBoneRotations,
+    AvatarEnsureRootBone,
     # lightmap operators
     LightmapPrepareUVMaps,
     LightmapPrepareMaterials,

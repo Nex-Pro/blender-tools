@@ -20,20 +20,10 @@ class AvatarPanel(bpy.types.Panel):
 		    operator="tivoli.avatar_add_armature"
 		)
 
-		layout.operator(
-		    icon="NODETREE",
-		    text="Add Tivoli settings node",
-		    operator="tivoli.avatar_add_tivoli_settings_node"
-		)
-
-		layout.operator(
-		    icon="NODETREE",
-		    text="Add \"glTF Settings\" node",
-		    operator="tivoli.avatar_add_gltf_settings_node"
-		)
+		# ---
 
 		layout.separator()
-		layout.label(text="Preview and fix your avatar")
+		layout.label(icon="OPTIONS", text="Preview and fix your avatar")
 
 		tpose = layout.row()
 		op = tpose.operator(
@@ -51,10 +41,41 @@ class AvatarPanel(bpy.types.Panel):
 
 		layout.operator(
 		    icon="BONE_DATA",
+		    text="Ensure/add root bone",
+		    operator="tivoli.avatar_ensure_root_bone"
+		)
+
+		# ---
+
+		layout.separator()
+		layout.label(icon="ERROR", text="Be careful, can make worse!")
+
+		layout.operator(
+		    icon="CONSTRAINT_BONE",
 		    text="Fix bone rotations",
 		    operator="tivoli.avatar_fix_bone_rotations"
 		)
 
-		layout.separator()
+		# extras
 
-		# layout.label(text="Rename bones")
+		tivoli_settings = context.scene.tivoli_settings
+
+		layout.separator()
+		layout.prop(
+		    tivoli_settings,
+		    "avatar_extras",
+		    text="Extras that aren't needed",
+		)
+
+		if tivoli_settings.avatar_extras:
+			layout.operator(
+			    icon="NODETREE",
+			    text="Add Tivoli settings node",
+			    operator="tivoli.avatar_add_tivoli_settings_node"
+			)
+
+			layout.operator(
+			    icon="NODETREE",
+			    text="Add \"glTF Settings\" node",
+			    operator="tivoli.avatar_add_gltf_settings_node"
+			)

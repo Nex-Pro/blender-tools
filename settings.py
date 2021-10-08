@@ -1,6 +1,10 @@
 import bpy
 
 class TivoliSettings(bpy.types.PropertyGroup):
+	avatar_extras: bpy.props.BoolProperty(default=False)
+
+	# ---
+
 	export_scene_webp: bpy.props.BoolProperty(
 	    name="WebP texture optimize", default=False
 	)
