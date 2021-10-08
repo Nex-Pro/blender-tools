@@ -17,16 +17,16 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	filename_ext = ".fst"
 	filter_glob: bpy.props.StringProperty(default="*.fst", options={"HIDDEN"})
 
-	webp_textures: bpy.props.BoolProperty(
-	    default=False,
-	    name="WebP texture optimize",
-	    description="Convert all textures to WebP"
+	gltf_export: bpy.props.BoolProperty(
+	    default=True,
+	    name="glTF export",
+	    description="Uses glTF instead of FBX"
 	)
 
-	gltf_export: bpy.props.BoolProperty(
+	webp_textures: bpy.props.BoolProperty(
 	    default=False,
-	    name="glTF export (experimental)",
-	    description="Uses glTF instead of FBX"
+	    name="WebP textures (FBX only)",
+	    description="Convert all textures to WebP"
 	)
 
 	# make_folder: bpy.props.BoolProperty(
@@ -150,30 +150,35 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 					)
 				shutil.rmtree(fbm_path)
 
-		# make material map
-		make_material_map_output = make_material_map(
-		    objects, self.webp_textures
-		)
-		material_map = make_material_map_output["material_map"]
-		images_to_save = make_material_map_output["images_to_save"]
-		images_to_convert = make_material_map_output["images_to_convert"]
+		# make material map if fbx
+		material_map = None
 
-		# save images from custom tivoli settings node
-		for image in images_to_save:
-			# tmp_image = image.copy()
-			# tmp_image.update()
-			# tmp_image.filepath_raw = os.path.join(
-			#     export_path, os.path.basename(image.filepath_raw)
-			# )
-			# tmp_image.save()
-			# bpy.data.images.remove(tmp_image)
-			image_path = os.path.normpath(
-			    bpy.path.abspath(image.filepath, library=image.library)
+		if not self.gltf_export:
+			make_material_map_output = make_material_map(
+			    objects, self.webp_textures
 			)
-			shutil.copy(
-			    image_path,
-			    os.path.join(export_path, os.path.basename(image.filepath_raw))
-			)
+			material_map = make_material_map_output["material_map"]
+			images_to_save = make_material_map_output["images_to_save"]
+			images_to_convert = make_material_map_output["images_to_convert"]
+
+			# save images from custom tivoli settings node
+			for image in images_to_save:
+				# tmp_image = image.copy()
+				# tmp_image.update()
+				# tmp_image.filepath_raw = os.path.join(
+				#     export_path, os.path.basename(image.filepath_raw)
+				# )
+				# tmp_image.save()
+				# bpy.data.images.remove(tmp_image)
+				image_path = os.path.normpath(
+				    bpy.path.abspath(image.filepath, library=image.library)
+				)
+				shutil.copy(
+				    image_path,
+				    os.path.join(
+				        export_path, os.path.basename(image.filepath_raw)
+				    )
+				)
 
 		# convert images to webp
 		if self.webp_textures:
@@ -211,9 +216,10 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		fst += "freeJoint = LeftForeArm\n"
 		fst += "freeJoint = RightArm\n"
 		fst += "freeJoint = RightForeArm\n"
-		fst += "materialMap = " + json.dumps(
-		    material_map, separators=(",", ":")
-		) + "\n"
+		if not self.gltf_export:
+			fst += "materialMap = " + json.dumps(
+			    material_map, separators=(",", ":")
+			) + "\n"
 		fst_file.write(fst)
 		fst_file.close()
 
