@@ -1,5 +1,15 @@
 # Tivoli Blender Tools
 
+## Download
+
+You can find the latest releases here:
+
+https://git.tivolicloud.com/tivolicloud/blender-tools/-/releases
+
+And the changelog here:
+
+https://docs.tivolicloud.com/blender-tools/changelog
+
 ## Installation
 
 No compiled releases exist yet so you have to do it manually.
