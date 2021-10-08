@@ -57,35 +57,6 @@ class AvatarForceTPose(bpy.types.Operator):
 				    data, child, world_matrix, bone, parent_node
 				)
 
-	def reset_scale_rotation(self, obj):
-		mode = bpy.context.area.type
-		bpy.context.area.type = "VIEW_3D"
-		bpy.ops.object.mode_set(mode="OBJECT")
-		bpy.ops.view3d.snap_cursor_to_center('INVOKE_DEFAULT')
-		bpy.context.area.type = mode
-		bpy.ops.object.select_all(action="DESELECT")
-
-		obj.select_set(True)
-		bpy.ops.object.transform_apply(
-		    location=False, rotation=True, scale=True
-		)
-
-		mode = mode
-
-	def correct_scale_rotation(self, obj, rotation):
-		self.reset_scale_rotation(obj)
-		obj.scale = Vector((100.0, 100.0, 100.0))
-		print(obj.scale)
-		str_angle = -90 * pi / 180
-		if rotation:
-			obj.rotation_euler = Euler((str_angle, 0, 0), "XYZ")
-
-		self.reset_scale_rotation(obj)
-
-		obj.scale = Vector((0.01, 0.01, 0.01))
-		if rotation:
-			obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")
-
 	def clear_pose(self, selected):
 		armature = self.find_armature(selected)
 		if armature is not None:
@@ -145,13 +116,13 @@ class AvatarForceTPose(bpy.types.Operator):
 				if bpy.context.mode != "OBJECT":
 					bpy.ops.object.mode_set(mode="OBJECT")
 
-				print("Correcting Scale and Rotations")
-				self.correct_scale_rotation(armature, True)
+				# print("Correcting Scale and Rotations")
+				# self.correct_scale_rotation(armature, True)
 
-				print(" Correcting child rotations and scale")
-				for child in armature.children:
-					if selected_only == False or child.select_get():
-						self.correct_scale_rotation(child, False)
+				# print(" Correcting child rotations and scale")
+				# for child in armature.children:
+				# 	if selected_only == False or child.select_get():
+				# 		self.correct_scale_rotation(child, False)
 
 				bpy.context.view_layer.objects.active = armature
 

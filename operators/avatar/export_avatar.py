@@ -101,11 +101,15 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		# make all meshes size 0.01 as well as armature but 90 deg on x axis
 		# this fixes the feet not staying on the ground
 
-		for obj in objects:
-			if obj is armature:
-				utils.correct_scale_rotation(obj, True)
-			else:
-				utils.correct_scale_rotation(obj, False)
+		# for obj in objects:
+		# 	if obj is armature:
+		# 		utils.correct_scale_rotation(obj, True)
+		# 	else:
+		# 		utils.correct_scale_rotation(obj, False)
+
+		# nope... this does
+
+		utils.ensure_root_bone(armature)
 
 		# select all to export
 

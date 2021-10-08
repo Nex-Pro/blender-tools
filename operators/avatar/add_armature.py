@@ -1,6 +1,7 @@
 import bpy
 
 from .lib.tivoli_skeleton import tivoli_skeleton
+from ... import utils
 
 class AvatarAddArmature(bpy.types.Operator):
 	bl_idname = "tivoli.avatar_add_armature"
@@ -31,35 +32,6 @@ class AvatarAddArmature(bpy.types.Operator):
 
 		return current_bone
 
-	def reset_scale_rotation(self, obj):
-		mode = bpy.context.area.type
-		bpy.context.area.type = "VIEW_3D"
-		bpy.ops.object.mode_set(mode="OBJECT")
-		bpy.ops.view3d.snap_cursor_to_center('INVOKE_DEFAULT')
-		bpy.context.area.type = mode
-		bpy.ops.object.select_all(action="DESELECT")
-
-		obj.select_set(True)
-		bpy.ops.object.transform_apply(
-		    location=False, rotation=True, scale=True
-		)
-
-		mode = mode
-
-	def correct_scale_rotation(self, obj, rotation):
-		self.reset_scale_rotation(obj)
-		obj.scale = Vector((100.0, 100.0, 100.0))
-		print(obj.scale)
-		str_angle = -90 * pi / 180
-		if rotation:
-			obj.rotation_euler = Euler((str_angle, 0, 0), "XYZ")
-
-		self.reset_scale_rotation(obj)
-
-		obj.scale = Vector((0.01, 0.01, 0.01))
-		if rotation:
-			obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")
-
 	def execute(self, context):
 		current_view = bpy.context.area.type
 
@@ -83,10 +55,10 @@ class AvatarAddArmature(bpy.types.Operator):
 				    current_armature.data, root_bone, None
 				)
 
-			self.correct_scale_rotation(bpy.context.active_object, True)
+			utils.ensure_root_bone(current_armature)
 
-		except Exception as detail:
-			print("Error", detail)
+		except Exception as exception:
+			raise exception
 
 		finally:
 			bpy.context.area.type = current_view

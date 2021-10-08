@@ -155,30 +155,58 @@ def is_in_parent_tree(start_obj, query_obj):
 
 # https://github.com/Menithal/Blender-Metaverse-Addon/blob/master/metaverse_tools/utils/bones/bones_builder.py#L620
 
-def reset_scale_rotation(obj):
-	override = get_context_with_area("VIEW_3D", bpy.context)
+# def reset_scale_rotation(obj):
+# 	override = get_context_with_area("VIEW_3D", bpy.context)
 
-	bpy.ops.object.mode_set(override, mode="OBJECT")
-	bpy.ops.view3d.snap_cursor_to_center(override, 'INVOKE_DEFAULT')
-	bpy.ops.object.select_all(override, action="DESELECT")
+# 	bpy.ops.object.mode_set(override, mode="OBJECT")
+# 	bpy.ops.view3d.snap_cursor_to_center(override, 'INVOKE_DEFAULT')
+# 	bpy.ops.object.select_all(override, action="DESELECT")
 
-	obj.select_set(True)
-	bpy.ops.object.transform_apply(
-	    override, location=False, rotation=True, scale=True
-	)
+# 	obj.select_set(True)
+# 	bpy.ops.object.transform_apply(
+# 	    override, location=False, rotation=True, scale=True
+# 	)
 
-def correct_scale_rotation(obj, rotation):
-	str_angle = -90 * pi / 180
+# def correct_scale_rotation(obj, rotation):
+# 	str_angle = -90 * pi / 180
 
-	reset_scale_rotation(obj)
-	# obj.scale = Vector((100.0, 100.0, 100.0))
-	if rotation:
-		obj.rotation_euler = Euler((str_angle, 0, 0), "XYZ")
+# 	reset_scale_rotation(obj)
+# 	# obj.scale = Vector((100.0, 100.0, 100.0))
+# 	if rotation:
+# 		obj.rotation_euler = Euler((str_angle, 0, 0), "XYZ")
 
-	reset_scale_rotation(obj)
-	# obj.scale = Vector((0.01, 0.01, 0.01))
-	if rotation:
-		obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")
+# 	reset_scale_rotation(obj)
+# 	# obj.scale = Vector((0.01, 0.01, 0.01))
+# 	if rotation:
+# 		obj.rotation_euler = Euler((-str_angle, 0, 0), "XYZ")
+
+# the above doesnt fix the problem. adding a root bone does!
+
+def ensure_root_bone(armature):
+	bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+	select_only(armature)
+
+	bpy.ops.object.mode_set(mode="EDIT", toggle=False)
+	edit_bones = armature.data.edit_bones
+
+	hip_bone = None
+	for bone in edit_bones:
+		if bone.name == "Hips":
+			hip_bone = bone
+			break
+
+	if hip_bone == None:
+		bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
+		raise Exception("Hips bone not found")
+
+	if hip_bone.parent == None:
+		# make root bone!
+		root_bone = edit_bones.new("Root")
+		root_bone.head = (0.0, 0.0, 0.0)
+		root_bone.tail = hip_bone.head
+		hip_bone.parent = root_bone
+
+	bpy.ops.object.mode_set(mode="OBJECT", toggle=False)
 
 def addon_installed(addon_name: str):
 	for addon in bpy.context.preferences.addons:
