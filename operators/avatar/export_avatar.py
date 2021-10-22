@@ -24,6 +24,12 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 	    description="Uses glTF instead of FBX"
 	)
 
+	as_glb: bpy.props.BoolProperty(
+	    default=True,
+	    name="as .glb",
+	    description="Export .glb instead of .gltf"
+	)
+
 	webp_textures: bpy.props.BoolProperty(
 	    default=False,
 	    name="WebP textures",
@@ -38,9 +44,13 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 
 	def draw(self, context):
 		layout = self.layout
-		layout.prop(self, "webp_textures")
+
 		layout.prop(self, "gltf_export")
-		# layout.prop(self, "make_folder")
+		gltf_settings = layout.box()
+		gltf_settings.enabled = self.gltf_export
+		gltf_settings.prop(self, "as_glb")
+
+		layout.prop(self, "webp_textures")
 
 	def execute(self, context):
 		if not self.filepath:
@@ -72,7 +82,9 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		fst_filepath = self.filepath
 		export_path = os.path.dirname(self.filepath)
 		if self.gltf_export:
-			model_filepath = utils.replace_filename_ext(self.filepath, ".gltf")
+			model_filepath = utils.replace_filename_ext(
+			    self.filepath, ".glb" if self.as_glb else ".gltf"
+			)
 		else:
 			model_filepath = utils.replace_filename_ext(self.filepath, ".fbx")
 
@@ -123,7 +135,7 @@ class AvatarExportAvatar(bpy.types.Operator, ExportHelper):
 		if self.gltf_export:
 			bpy.ops.export_scene.gltf(
 			    filepath=model_filepath,
-			    export_format="GLTF_SEPARATE",
+			    export_format="GLB" if self.as_glb else "GLTF_SEPARATE",
 			    export_image_format="AUTO",
 			    use_selection=True,
 			    export_apply=True
